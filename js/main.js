@@ -50,7 +50,10 @@ class player {
     this.armi = [];
     this.borsa = {
       coroneOro : 0
-    }
+    };
+    oggettiSpeciali = [
+      "Mappa"
+      ]
   }
  
  
