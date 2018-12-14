@@ -1,10 +1,18 @@
+:root {
+  --px-base-unit : 15px;
+}
+
+body {
+  padding: var(--px-base-unit);
+}
+
 /*FORM*/
 /* Radio */
 .container {
   display: block;
   position: relative;
-  padding-left: 35px;
-  margin-bottom: 12px;
+  padding-left: calc(var(--px-base-unit) * 2);
+  margin-bottom: var(--px-base-unit);
   cursor: pointer;
   font-size: 22px;
   -webkit-user-select: none;
