@@ -40,24 +40,31 @@ class game  {
 }
 
 class player {
-  constructor(comb, res) {
-    this.combattivita = 20 + comb;
-    this.resistenza = 10 + res;
-    this.artiRamas = [];
+  constructor({combattivita, resistenza, artiRamas, pasti, pozione, armi, coroneOro, elmo, cottaDiMaglia }) {
+    
+    this.combattivita = 20 + combattivita;
+    this.resistenza = 10 + resistenza;
+    
+    this.artiRamas = artiRamas;
+    
     this.zaino = {
-      pasti: 1
+      pasti: pasti || 1,
+      pozione: pazione || 0
     };
-    this.armi = [];
+    
+    this.armi = armi || [6];
+    
     this.borsa = {
-      coroneOro : 0
+      coroneOro : coroneOro
     };
+    
+    this.armatura = {
+      elmo: elmo || elmo,
+      cottaDiMaglia : cottaDiMaglia || false
+    }
+    
     oggettiSpeciali = [
-      "Mappa"
+      "Mappa di Summerlund"
       ]
   }
- 
- 
- 
-  
 }
-console.log("gino");

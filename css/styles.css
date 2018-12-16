@@ -6,19 +6,22 @@ body {
   padding: var(--px-base-unit);
 }
 
-/*FORM*/
-/* Radio */
-.container {
+label {
   display: block;
   position: relative;
-  padding-left: calc(var(--px-base-unit) * 2);
+  font-size: 22px;
   margin-bottom: var(--px-base-unit);
   cursor: pointer;
-  font-size: 22px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+/*FORM*/
+/* Radio */
+.container {
+  padding-left: calc(var(--px-base-unit) * 2);
 }
 
 /* Hide the browser's default checkbox */
@@ -78,6 +81,11 @@ body {
 /*Checkbox*/
 
 /* Create a custom radio button */
+.radio .container {
+  display: inline-block;
+  margin-right: var(--px-base-unit);
+}
+
 .radio .checkmark {
   border-radius: 50%;
 }
