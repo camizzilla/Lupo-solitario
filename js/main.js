@@ -39,23 +39,21 @@ class Game  {
   }
   
   addArtiRamas(){
-
-
+    
+    
     
     // Make the list
     var listElement = document.getElementById('arti-ramas');
     
     if(this.artiRamas.length){
       this.artiRamas.forEach( (arti) => {
-        let checkboxDiv = document.createElement('div');
-        checkboxDiv.className = 'checkbox';
+        let checkboxDiv = this.createElem('div',['checkbox']);
         
-        let labelBox = document.createElement('label');
-        labelBox.className = 'container';
+        let labelBox = this.createElem('label',['container']);
         labelBox.innerHTML = arti;
         let input = document.createElement('input');
         input.setAttribute("type", "checkbox");
-        input.setAttribute("checked", "checked");
+       // input.setAttribute("checked", "checked");
         let span = document.createElement('span');
         span.className = 'checkmark';
         
@@ -68,7 +66,14 @@ class Game  {
         listElement.appendChild(checkboxDiv);
       });
     }
-  }
+  } 
+    createElem(tag, classes){
+      let el = document.createElement(tag);
+      if(classes.length){
+        el.classList.add(...classes);
+      }
+      return el;
+    }
 }
 
 class player {
