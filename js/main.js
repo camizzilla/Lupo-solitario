@@ -39,12 +39,9 @@ class Game  {
   }
   
   addArtiRamas(){
-    
-    
-    
     // Make the list
-    var listElement = document.getElementById('arti-ramas');
-    
+    let listElement = document.getElementById('arti-ramas');
+    let checkboxes = [];
     if(this.artiRamas.length){
       this.artiRamas.forEach( (arti) => {
         let checkboxDiv = this.createElem('div',['checkbox']);
@@ -53,27 +50,46 @@ class Game  {
         labelBox.innerHTML = arti;
         let input = document.createElement('input');
         input.setAttribute("type", "checkbox");
-       // input.setAttribute("checked", "checked");
-        let span = document.createElement('span');
-        span.className = 'checkmark';
+        input.setAttribute("name", "checkbox");
+        checkboxes.push(input);
+        let span = this.createElem('span', ['checkmark']);
         
         labelBox.appendChild(input);
-        
         labelBox.appendChild(span);
-        
         checkboxDiv.appendChild(labelBox);
-        
         listElement.appendChild(checkboxDiv);
       });
     }
-  } 
-    createElem(tag, classes){
-      let el = document.createElement(tag);
-      if(classes.length){
-        el.classList.add(...classes);
-      }
-      return el;
+    this.checkBoxLimit(checkboxes, 5)
+  }
+  createElem(tag, classes){
+    let el = document.createElement(tag);
+    if(classes.length){
+      el.classList.add(...classes);
     }
+    return el;
+  }
+  
+  checkBoxLimit(checkBoxGroup, limit) {
+    
+    let checkboxCounter = 0;
+    checkBoxGroup.forEach( (checkBox) => {
+      checkBox.addEventListener( 'change', () => {
+        
+        if(checkBox.checked) {
+          if(checkboxCounter < limit){
+            checkboxCounter++;
+          }else {
+            checkBox.checked = false;
+          }
+        } else {
+          if(checkboxCounter > 0){
+            checkboxCounter--;
+          }
+        }
+      });
+    });
+  }
 }
 
 class player {
