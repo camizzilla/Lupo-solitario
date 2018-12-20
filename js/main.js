@@ -38,19 +38,41 @@ class Game  {
     ];
   }
   
+  formComponent(){
+    this.addArtiRamas();
+    this.caratteristiche();
+    
+  }
+  
+  caratteristiche(){
+    let combBtn = document.getElementById('comb-btn');
+    let resBtn = document.getElementById('res-btn');
+    let combSpan = document.getElementById('res-comb');
+    let resSpan = document.getElementById('res-res');
+    combBtn.addEventListener('click', () => {
+      combSpan.innerHTML =  this.dice();
+    });
+    resBtn.addEventListener('click', () => {
+      resSpan.innerHTML =  this.dice();
+    });
+  }
+  
   addArtiRamas(){
     // Make the list
     let listElement = document.getElementById('arti-ramas');
     let checkboxes = [];
+    let scherma;
     if(this.artiRamas.length){
-      this.artiRamas.forEach( (arti) => {
+      this.artiRamas.forEach( (arte) => {
         let checkboxDiv = this.createElem('div',['checkbox']);
         
         let labelBox = this.createElem('label',['container']);
-        labelBox.innerHTML = arti;
+        labelBox.innerHTML = arte;
         let input = document.createElement('input');
         input.setAttribute("type", "checkbox");
         input.setAttribute("name", "checkbox");
+        input.id = arte;
+        if(arte === "Scherma") scherma = input;
         checkboxes.push(input);
         let span = this.createElem('span', ['checkmark']);
         
@@ -60,8 +82,22 @@ class Game  {
         listElement.appendChild(checkboxDiv);
       });
     }
-    this.checkBoxLimit(checkboxes, 5)
+    this.checkBoxLimit(checkboxes, 5);
+    
+    let schermaRes = document.getElementById('scherma-res');
+    scherma.addEventListener('change', () => {
+      if(scherma.checked) {
+        schermaRes.innerHTML = this.armi[this.dice()];
+      }
+    });
+    
   }
+  
+  
+  getElem(tag, classes){
+    return document.getElementsByClassName(classes);
+  }
+  
   createElem(tag, classes){
     let el = document.createElement(tag);
     if(classes.length){
@@ -89,6 +125,10 @@ class Game  {
         }
       });
     });
+  }
+  
+  dice(){
+    return  Math.floor(Math.random() * 10) + 1;
   }
 }
 
@@ -123,4 +163,9 @@ class player {
 }
 
 let game = new Game();
-game.addArtiRamas();
+game.formComponent();
+
+  
+  
+  
+  // resSpan.innerHTML = res;

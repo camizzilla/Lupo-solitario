@@ -8,7 +8,7 @@
 </head>
 <body>
   
-  <form id="creazione" name="creazione">
+  <div id="creazione" name="creazione">
     
     <div class="livello form-block">
       <h2>Livello di difficoltà</h2>
@@ -24,21 +24,22 @@
       </div>
     </div>  <!-- livello -->
     
-    <div class="arti-ramas form-block block">
+    <div class="caratteristiche form-block block">
       <h2>Caratteristiche</h2>
-      <label> Combattività
-        
+      <label> Combattività <span id="res-comb"></span>
+        <button id="comb-btn">🎲</button>
       </label>
-      <label> Resistenza
-        
+      <label> Resistenza <span id="res-res"></span>
+        <button id="res-btn">🎲</button>
       </label>
     </div>
     
     <div id="arti-ramas" class="arti-ramas form-block">
       <h2>Arti Ramas</h2>
+      <p id="scherma-res"></p>
     </div>
     
-  </form>
+  </div>
   
   
   

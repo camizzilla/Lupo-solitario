@@ -81,17 +81,17 @@ label {
 /*Checkbox*/
 
 /* Create a custom radio button */
-.radio .container {
+.radios .container {
   display: inline-block;
   margin-right: var(--px-base-unit);
 }
 
-.radio .checkmark {
+.radios .checkmark {
   border-radius: 50%;
 }
 
 /* Style the indicator (dot/circle) */
-.radio .container .checkmark:after  {
+.radios .container .checkmark:after  {
   top: 8px;
   left: 8px;
   width: 10px;
