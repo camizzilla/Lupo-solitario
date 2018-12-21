@@ -41,7 +41,7 @@ class Game  {
   formComponent(){
     this.addArtiRamas();
     this.caratteristiche();
-    
+    this.findObj();
   }
   
   caratteristiche(){
@@ -65,15 +65,17 @@ class Game  {
     if(this.artiRamas.length){
       this.artiRamas.forEach( (arte) => {
         let checkboxDiv = this.createElem('div',['checkbox']);
-        
         let labelBox = this.createElem('label',['container']);
+        
         labelBox.innerHTML = arte;
         let input = document.createElement('input');
         input.setAttribute("type", "checkbox");
         input.setAttribute("name", "checkbox");
         input.id = arte;
+        
         if(arte === "Scherma") scherma = input;
         checkboxes.push(input);
+        
         let span = this.createElem('span', ['checkmark']);
         
         labelBox.appendChild(input);
@@ -90,9 +92,13 @@ class Game  {
         schermaRes.innerHTML = this.armi[this.dice()];
       }
     });
-    
   }
   
+  findObj(){
+    let findBtn = document.getElementById('find-btn');
+    let findSpan = document.getElementById('find');
+    findBtn.addEventListener('click', () =>  findSpan.innerHTML = this.oggettiTrovati[this.dice()]);
+  }
   
   getElem(tag, classes){
     return document.getElementsByClassName(classes);
