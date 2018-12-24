@@ -45,12 +45,21 @@ class Game  {
   }
   
   caratteristiche(){
+    let countComb = 0;
+    let countRes = 0;
+    
     let combBtn = document.getElementById('comb-btn');
     let resBtn = document.getElementById('res-btn');
     let combSpan = document.getElementById('res-comb');
     let resSpan = document.getElementById('res-res');
     combBtn.addEventListener('click', () => {
-      combSpan.innerHTML =  this.dice();
+      if(this.maxNumber(countComb, 3)){
+        combSpan.innerHTML =  this.dice();
+        countComb++;
+      } else {
+        this.error("Ti piace vincere facile ?", "err-caratteristiche");
+      }
+      
     });
     resBtn.addEventListener('click', () => {
       resSpan.innerHTML =  this.dice();
@@ -133,6 +142,15 @@ class Game  {
     });
   }
   
+  maxNumber(counter,max){
+    if(counter <= max) return true;
+  }
+  
+  error(msg, tag){
+    console.log(tag);
+    document.getElementById(tag).innerHTML = msg;
+  }
+  
   dice(){
     return  Math.floor(Math.random() * 10) + 1;
   }
@@ -171,7 +189,7 @@ class player {
 let game = new Game();
 game.formComponent();
 
-  
-  
-  
-  // resSpan.innerHTML = res;
+
+
+
+// resSpan.innerHTML = res;
