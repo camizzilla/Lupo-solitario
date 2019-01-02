@@ -1,6 +1,6 @@
 class Game  {
   constructor(){
-    this.livelloFacile = false;
+    this.livello = 0;
     this.artiRamas = [
       "Mimetismo",
       "Caccia",
@@ -41,32 +41,46 @@ class Game  {
   formComponent(){
     this.addArtiRamas();
     this.caratteristiche();
+    this.level();
     this.findObj();
   }
   
+  level(){
+    
+    let facile = document.getElementById('facile');
+    let difficile = document.getElementById('difficile');
+
+    facile.addEventListener('click', () => {
+      if(facile.checked){
+        this.livello = 3;
+        console.log(this.livello);
+      }
+    });
+    
+    difficile.addEventListener('click', () => {
+      if(difficile.checked){
+        this.livello = 0;
+        console.log(this.livello);
+      }
+    });
+  }
+  
   caratteristiche(){
-    let countComb = 0;
-    let countRes = 0;
     
     let combBtn = document.getElementById('comb-btn');
     let resBtn = document.getElementById('res-btn');
     let combSpan = document.getElementById('res-comb');
     let resSpan = document.getElementById('res-res');
     combBtn.addEventListener('click', () => {
-      if(this.maxNumber(countComb, 3)){
-        combSpan.innerHTML =  this.dice();
-        countComb++;
-      } else {
-        this.error("Ti piace vincere facile ?", "err-caratteristiche");
-      }
-      
+      this.innerHtml(combSpan);
     });
     resBtn.addEventListener('click', () => {
-      resSpan.innerHTML =  this.dice();
+      this.innerHtml(resSpan);
     });
   }
   
   addArtiRamas(){
+    let arma = null;
     // Make the list
     let listElement = document.getElementById('arti-ramas');
     let checkboxes = [];
@@ -97,8 +111,9 @@ class Game  {
     
     let schermaRes = document.getElementById('scherma-res');
     scherma.addEventListener('change', () => {
-      if(scherma.checked) {
-        schermaRes.innerHTML = this.armi[this.dice()];
+      if(scherma.checked && !arma) {
+        arma = this.armi[this.dice() -1];
+        schermaRes.innerHTML = arma;
       }
     });
   }
@@ -147,12 +162,16 @@ class Game  {
   }
   
   error(msg, tag){
-    console.log(tag);
     document.getElementById(tag).innerHTML = msg;
   }
   
+  innerHtml(tag){
+    let res =  this.dice() + 1 + this.livello;
+    tag.innerHTML = res >= 10 ? 10 : res;
+  }
+  
   dice(){
-    return  Math.floor(Math.random() * 10) + 1;
+    return  Math.floor(Math.random() * 10) ;
   }
 }
 
@@ -189,7 +208,7 @@ class player {
 let game = new Game();
 game.formComponent();
 
-
-
-
-// resSpan.innerHTML = res;
+  
+  
+  
+  // resSpan.innerHTML = res;
