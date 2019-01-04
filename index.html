@@ -14,18 +14,19 @@
       <h2>Livello di difficoltà</h2>
       <div class="radio">
         <label class="container">Facile
-          <input type="radio" checked="checked" name="radio">
+          <input id="facile" type="radio" checked="checked" name="radio">
           <span class="checkmark"></span>
         </label>
         <label class="container">Difficile
-          <input type="radio" name="radio">
+          <input id="difficile" type="radio" name="radio">
           <span class="checkmark"></span>
         </label>
       </div>
     </div>  <!-- livello -->
-    <h2 id="err-caratteristiche"></h2>
+    
     <div class="caratteristiche form-block block">
       <h2>Caratteristiche</h2>
+      <h2 id="err-caratteristiche"></h2>
       <label> Combattività <span id="res-comb"></span>
         <button id="comb-btn">🎲</button>
       </label>
@@ -41,11 +42,12 @@
     
     <div class="caratteristiche form-block block">
       <h2></h2>
-      <label> Cerca tra le macerie <span id="find"></span>
+      <label id="find"> Cerca tra le macerie
         <button id="find-btn">🎲</button>
       </label>
+      <h3 id="find-it"></h3>
     </div>
-    
+    <button id="submit"> Gioca </button>
   </div>
   
   

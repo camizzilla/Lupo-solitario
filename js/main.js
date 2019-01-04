@@ -1,6 +1,15 @@
 class Game  {
   constructor(){
-    this.livello = 0;
+    this.livello = true;
+    this.livelloFacile = 3;
+    this.playerRes = {
+      livello: true,
+      combattivita: '',
+      resistenza: '',
+      artiRamas: [],
+      oggettoTrovato: '',
+      arma: ''
+    };
     this.artiRamas = [
       "Mimetismo",
       "Caccia",
@@ -39,48 +48,70 @@ class Game  {
   }
   
   formComponent(){
-    this.addArtiRamas();
-    this.caratteristiche();
-    this.level();
-    this.findObj();
-  }
-  
-  level(){
-    
     let facile = document.getElementById('facile');
     let difficile = document.getElementById('difficile');
-
+    
+    this.level(facile, difficile);
+    this.addArtiRamas();
+    this.caratteristiche();
+    this.findObj();
+    let submit = document.getElementById("submit");
+    submit.addEventListener('click', () => {
+      console.log('this.playerRes::: ',this.playerRes);
+      if(this.playerRes.combattivita === ''){
+        console.log('error');
+      }
+    });
+  }
+  
+  level(facile, difficile){
+    
     facile.addEventListener('click', () => {
       if(facile.checked){
-        this.livello = 3;
-        console.log(this.livello);
+        this.playerRes.livello = true;
       }
     });
     
     difficile.addEventListener('click', () => {
       if(difficile.checked){
-        this.livello = 0;
-        console.log(this.livello);
+        this.playerRes.livello = false;
       }
     });
   }
   
   caratteristiche(){
-    
+    let counterComb = 3;
+    let counterRes = 3;
     let combBtn = document.getElementById('comb-btn');
     let resBtn = document.getElementById('res-btn');
     let combSpan = document.getElementById('res-comb');
     let resSpan = document.getElementById('res-res');
+    
     combBtn.addEventListener('click', () => {
-      this.innerHtml(combSpan);
+      if(this.playerRes.livello && counterComb){
+        this.playerRes.combattivita = this.innerHtml(combSpan);
+        counterComb--;
+      } else {
+        this.playerRes.combattivita = this.innerHtml(combSpan);
+        combBtn.disabled = true;
+        combBtn.classList.add('hidden');
+      }
     });
+    
     resBtn.addEventListener('click', () => {
-      this.innerHtml(resSpan);
+      if(this.playerRes.livello && counterRes){
+        this.playerRes.resistenza = this.innerHtml(resSpan);
+        counterRes--;
+      } else {
+        this.playerRes.resistenza = this.innerHtml(resSpan);
+        resBtn.disabled = true;
+        resBtn.classList.add('hidden');
+      }
     });
   }
   
   addArtiRamas(){
-    let arma = null;
+    let schemaHtml;
     // Make the list
     let listElement = document.getElementById('arti-ramas');
     let checkboxes = [];
@@ -96,7 +127,12 @@ class Game  {
         input.setAttribute("name", "checkbox");
         input.id = arte;
         
-        if(arte === "Scherma") scherma = input;
+        if(arte === "Scherma") {
+          scherma = input;
+          schemaHtml = document.createElement('span');
+          schemaHtml.classList.add("arma", "hidden");
+          labelBox.appendChild(schemaHtml);
+        }
         checkboxes.push(input);
         
         let span = this.createElem('span', ['checkmark']);
@@ -105,23 +141,53 @@ class Game  {
         labelBox.appendChild(span);
         checkboxDiv.appendChild(labelBox);
         listElement.appendChild(checkboxDiv);
+        
+        input.addEventListener('change', () => {
+          if(input.checked) {
+            this.playerRes.artiRamas.push(arte);
+          }else {
+            var index = this.playerRes.artiRamas.indexOf(arte);
+            if (index > -1) {
+              this.playerRes.artiRamas.splice(index, 1);
+            }
+          }
+        });
       });
     }
     this.checkBoxLimit(checkboxes, 5);
     
     let schermaRes = document.getElementById('scherma-res');
     scherma.addEventListener('change', () => {
-      if(scherma.checked && !arma) {
-        arma = this.armi[this.dice() -1];
-        schermaRes.innerHTML = arma;
+      if(scherma.checked) {
+        if(!this.playerRes.arma){
+          this.playerRes.arma = this.armi[this.dice()];
+          schemaHtml.innerHTML = this.playerRes.arma;
+        }
+        if(schemaHtml.classList.contains("hidden")){
+          schemaHtml.classList.remove("hidden");
+        }
+      } else {
+        schemaHtml.classList.add("hidden");
       }
     });
   }
   
   findObj(){
+    let counter = 3;
     let findBtn = document.getElementById('find-btn');
-    let findSpan = document.getElementById('find');
-    findBtn.addEventListener('click', () =>  findSpan.innerHTML = this.oggettiTrovati[this.dice()]);
+    let find = document.getElementById('find');
+    let findIt = document.getElementById('find-it');
+    findBtn.addEventListener('click', () => {
+      if(this.playerRes.livello && counter){
+        findIt.innerHTML = "Hai trovato [ " + this.oggettiTrovati[this.dice()] + " ]";
+        counter--;
+      } else {
+        findIt.innerHTML = "Hai trovato [ " + this.oggettiTrovati[this.dice()] + " ]";
+        find.disabled = true;
+        find.classList.add('hidden');
+      }
+    });
+    
   }
   
   getElem(tag, classes){
@@ -166,8 +232,17 @@ class Game  {
   }
   
   innerHtml(tag){
-    let res =  this.dice() + 1 + this.livello;
-    tag.innerHTML = res >= 10 ? 10 : res;
+    let res =  this.dice();
+    console.log(res);
+    if(this.playerRes.livello){
+      if( (res + this.livelloFacile) > 10){
+        res = 10;
+      }else {
+        res += this.livelloFacile;
+      }
+    }
+    tag.innerHTML = res;
+    return res;
   }
   
   dice(){
@@ -208,7 +283,7 @@ class player {
 let game = new Game();
 game.formComponent();
 
-  
-  
-  
-  // resSpan.innerHTML = res;
+
+
+
+// resSpan.innerHTML = res;
