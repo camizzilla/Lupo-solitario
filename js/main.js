@@ -55,17 +55,27 @@ class Game  {
     this.addArtiRamas();
     this.caratteristiche();
     this.findObj();
+    
     let submit = document.getElementById("submit");
     submit.addEventListener('click', () => {
-      console.log('this.playerRes::: ',this.playerRes);
-      if(this.playerRes.combattivita === ''){
+      // console.log('this.playerRes::: ',this.playerRes);
+      
+      if( (this.playerRes.combattivita === '') || 
+          (this.playerRes.resistenza === '') ||
+          (this.playerRes.artiRamas.length < 5) ||
+          (this.playerRes.oggettoTrovato === '')
+        ){
+          if(this.playerRes.combattivita === '') {
+            this.validation()
+          }
         console.log('error');
+      } else {
+        console.log('ok');
       }
     });
   }
   
   level(facile, difficile){
-    
     facile.addEventListener('click', () => {
       if(facile.checked){
         this.playerRes.livello = true;
@@ -150,6 +160,10 @@ class Game  {
             if (index > -1) {
               this.playerRes.artiRamas.splice(index, 1);
             }
+            
+            if(arte === "Scherma") {
+              this.playerRes.arma = "";
+            }
           }
         });
       });
@@ -179,15 +193,29 @@ class Game  {
     let findIt = document.getElementById('find-it');
     findBtn.addEventListener('click', () => {
       if(this.playerRes.livello && counter){
-        findIt.innerHTML = "Hai trovato [ " + this.oggettiTrovati[this.dice()] + " ]";
+        this.playerRes.oggettoTrovato = this.oggettiTrovati[this.dice()];
+        
+        this.nonUguali();
+        
+        findIt.innerHTML = "Hai trovato [ " + this.playerRes.oggettoTrovato + " ]";
         counter--;
       } else {
-        findIt.innerHTML = "Hai trovato [ " + this.oggettiTrovati[this.dice()] + " ]";
+        this.playerRes.oggettoTrovato = this.oggettiTrovati[this.dice()];
+        findIt.innerHTML = "Hai trovato [ " + this.playerRes.oggettoTrovato + " ]";
         find.disabled = true;
         find.classList.add('hidden');
       }
     });
     
+  }
+  
+  nonUguali(){
+    let oggettoTemp = this.oggettiTrovati[this.dice()];
+    if(this.playerRes.oggettoTrovato === this.playerRes.arma){
+      console.log(`${this.playerRes.oggettoTrovato} === ${this.playerRes.arma}`);
+      this.playerRes.oggettoTrovato = this.oggettiTrovati[this.dice()];
+      this.nonUguali();
+    }
   }
   
   getElem(tag, classes){

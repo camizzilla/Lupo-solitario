@@ -33,6 +33,21 @@ label {
   width: 0;
 }
 
+.container .arma {
+  margin-left : var(--px-base-unit);
+}
+
+.container .arma::before {
+  content: '[';
+  margin-right : var(--px-base-unit);
+}
+
+.container .arma::after {
+  content: ']';
+  margin-left : var(--px-base-unit);
+}
+
+
 /* Create a custom checkbox */
 .checkmark {
   position: absolute;
@@ -81,21 +96,25 @@ label {
 /*Checkbox*/
 
 /* Create a custom radio button */
-.radios .container {
+.radio .container {
   display: inline-block;
   margin-right: var(--px-base-unit);
 }
 
-.radios .checkmark {
+.radio .checkmark {
   border-radius: 50%;
 }
 
 /* Style the indicator (dot/circle) */
-.radios .container .checkmark:after  {
+.radio .container .checkmark:after  {
   top: 8px;
   left: 8px;
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background: white;
+}
+
+.hidden {
+  display: none;
 }
