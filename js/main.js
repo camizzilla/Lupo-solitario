@@ -24,6 +24,19 @@ const armiList = [
   "Spadone"
 ];
 
+const risultatiCombattimento = [
+  [{n: 0, ls: "M"},{n: 0, ls: "M"},{n: 0, ls: 8},{n: 0, ls: 6},{n: 1, ls: 6},{n: 3, ls: 5},{n: 4, ls: 5},{n: 5, ls: 4},{n: 6, ls: 4},{n: 7, ls: 4},{n: 8, ls: 3},{n: 9, ls: 3}],
+  [{n: 0, ls: "M"},{n: 0, ls: 8},{n: 0, ls: 7},{n: 1, ls: 6},{n: 2, ls: 5},{n: 4, ls: 4},{n: 5, ls: 4},{n: 6, ls: 3},{n: 7, ls: 3},{n: 8, ls: 3},{n: 9, ls: 3},{n: 10, ls: 2}],
+  [{n: 0, ls: 8},{n: 0, ls: 7},{n: 1, ls: 6},{n: 2, ls: 5},{n: 3, ls: 5},{n: 5, ls: 4},{n: 6, ls: 3},{n: 7, ls: 3},{n: 8, ls: 3},{n: 9, ls: 2},{n: 10, ls: 2},{n: 11, ls: 2}],
+  [{n: 0, ls: 8},{n: 1, ls: 7},{n: 2, ls: 6},{n: 3, ls: 5},{n: 4, ls: 4},{n: 6, ls: 3},{n: 7, ls: 3},{n: 8, ls: 2},{n: 9, ls: 2},{n: 10, ls: 2},{n: 11, ls: 2},{n: 12, ls: 2}],
+  [{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0}],
+  [{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0}],
+  [{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0}],
+  [{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0}],
+  [{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0}],
+  [{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0},{n: 0, ls: 0}]
+  ];
+
 class Game  {
   constructor(artiRamas, armiList){
     this.livello = true;
@@ -36,7 +49,8 @@ class Game  {
       resistenza: '',
       artiRamas: [],
       oggettoTrovato: '',
-      arma: ''
+      arma: '',
+      goldCoin: ''
     };
     this.artiRamas = artiRamas;
     this.armi = armiList;
@@ -62,6 +76,7 @@ class Game  {
     this.addArtiRamas();
     this.caratteristiche();
     this.findObj();
+    this.goldCoin();
   }
   
   // console.log('this.playerRes::: ',this.playerRes);
@@ -93,6 +108,11 @@ class Game  {
       if(this.playerRes.oggettoTrovato === '') {
         this.validation("oggettoTrovato", "Cerca tra le macerie");
         this.validator.push('oggettoTrovato');
+      }
+      
+      if(this.playerRes.goldCoin === '') {
+        this.validation("goldCoin", "Non voui le corone d'oro?");
+        this.validator.push('goldCoin');
       }
       return false;
     } else {
@@ -232,9 +252,9 @@ class Game  {
           }else {
             this.splice(this.playerRes.artiRamas, arte);
             
-            if(arte === "Scherma") {
-              this.playerRes.arma = "";
-            }
+            // if(arte === "Scherma") {
+            //   this.playerRes.arma = "";
+            // }
           }
         });
       });
@@ -282,6 +302,29 @@ class Game  {
       }
     });
     
+  }
+  
+  goldCoin(){
+    let counter = 3;
+    let btn = document.querySelector('.goldCoin button');
+    let label = document.querySelector('.goldCoin label');
+    let h3 = document.querySelector('.goldCoin h3');
+    
+    btn.addEventListener('click', () => {
+      this.reset(this.validator, "goldCoin");
+      
+      if(this.playerRes.livello && counter){
+        this.playerRes.goldCoin = this.dice();
+        
+        h3.innerHTML = "Hai trovato " + this.playerRes.goldCoin + " Corone d'oro";
+        counter--;
+      } else {
+        this.playerRes.goldCoin = this.dice();
+        h3.innerHTML = "Hai trovato " + this.playerRes.goldCoin + " Corone d'oro";
+        label.disabled = true;
+        label.classList.add('hidden');
+      }
+    });
   }
   
   nonUguali(){
@@ -359,7 +402,9 @@ class Player {
       combattivita,
       resistenza,
       artiRamas,
-      oggettoTrovato
+      oggettoTrovato,
+      arma,
+      goldCoin
     },
     armiList
   ) {
@@ -368,22 +413,19 @@ class Player {
     this.resistenza = 20 + resistenza;
     
     this.artiRamas = artiRamas;
+    this.abilitaScherma = arma || null;
     
     this.oggettoTrovato = oggettoTrovato;
     this.zaino = {
-      pasti: "pasti" || 1,
-      pozione: "pazione" || 0
+      pasti: 1,
+      pozione: 0,
+      oggetti: []
     };
     this.armiList = armiList;
-    this.armi = ["ascia"];
+    this.armi = ["Ascia"];
     
     this.borsa = {
-      coroneOro : "coroneOro"
-    };
-    
-    this.armatura = {
-      elmo: "elmo" || "elmo",
-      cottaDiMaglia : "cottaDiMaglia" || false
+      coroneOro : goldCoin
     };
     
     this.oggettiSpeciali = [
@@ -392,15 +434,45 @@ class Player {
   }
   
   init(){
-    this.caratteristiche();
     this.controlObj();
     this.addArmi();
     this.aggiungiArtiRamas();
+    this.caratteristiche();
+    this.zainoFunc();
+    this.borsello();
+    this.aggiungiOggettiSpeciali();
+    this.fight();
+    
+    document.querySelector("#fight").addEventListener('click', ()=>{
+      console.log("enemy");
+      
+      let enemy = {
+        combattivita : document.querySelector(".EnemyComb input").value,
+        resistenza : document.querySelector(".EnemyRes input").value,
+        psicoLaser: document.querySelector("#enemy-psicolaser").checked,
+        psicoScudo: document.querySelector("#enemy-psicoScudo").checked
+      };
+    });
   }
   
   controlObj(){
     let arma = this.controlInArray(this.armiList, this.oggettoTrovato);
-    if(arma) this.armi.push(arma);
+    if(arma) {
+      this.armi.push(arma)
+      
+    }else if( "elmo" === this.oggettoTrovato){
+      this.oggettiSpeciali.push(this.oggettoTrovato);
+      this.resistenza += 2;
+    }else if( "Cotta di maglia" === this.oggettoTrovato){
+      this.oggettiSpeciali.push(this.oggettoTrovato);
+      this.resistenza += 4;
+    }else if( "Pasti" === this.oggettoTrovato){
+      this.zaino.pasti += 2;
+    }else if( "Corone d'oro" === this.oggettoTrovato){
+      this.borsa.coroneOro += 12;
+    }else if( "Pozione" === this.oggettoTrovato){
+      this.zaino.pozione += 1;
+    }
   }
   
   caratteristiche(){
@@ -416,8 +488,6 @@ class Player {
         let list = document.createElement('li',['arma']);
         list.innerHTML = arma;
         listElement.appendChild(list);
-        
-        this.filtroArtiRamas(arte);
       });
     }
   }
@@ -426,12 +496,44 @@ class Player {
     let listElement = document.querySelector('#registro-guerra .arti');
     
     if(this.artiRamas.length){
-      this.artiRamas.forEach( (arte) => {
+      this.artiRamas.forEach( arte => {
         let list = document.createElement('li',['arte']);
         list.innerHTML = arte;
         listElement.appendChild(list);
         
         this.filtroArtiRamas(arte);
+      });
+    }
+  }
+  zainoFunc(){
+    this.print(".zaino .pozione", this.zaino.pozione);
+    this.print(".zaino .pasti", this.zaino.pasti);
+    
+    let listElement = document.querySelector('.zaino ol.oggetti');
+    if(this.zaino.oggetti.length){
+      this.zaino.oggetti.forEach( oggetto => {
+        let list = document.createElement('li',['oggetto']);
+        list.innerHTML = oggetto;
+        listElement.appendChild(list);
+        
+        this.filtroArtiRamas(arte);
+      });
+    }
+  }
+  
+  borsello(){
+    this.print(".borsa label span", this.borsa.coroneOro);
+  }
+  
+  aggiungiOggettiSpeciali(){
+    let listElement = document.querySelector('#registro-guerra .oggettiSpeciali');
+    
+    if(this.oggettiSpeciali.length){
+      this.oggettiSpeciali.forEach( oggettoSpeciale => {
+        let list = document.createElement('li',['oggettoSpeciale']);
+        list.innerHTML = oggettoSpeciale;
+        listElement.appendChild(list);
+        
       });
     }
   }
@@ -442,6 +544,13 @@ class Player {
     }else if(arte === "Caccia"){
       this.AddNota(`${arte}: Non sei obbligato a fare un Pasto quando ti viene ordinato`);
     }else if(arte === "Scherma"){
+      if(this.abilitaScherma){
+        this.armi.forEach(arma => {
+          if(arma === this.abilitaScherma) this.combattivita += 2;
+        });
+      }
+    }else if (arte === "Psicolaser"){
+      this.combattivita += 2;
     }
   }
   
@@ -465,6 +574,12 @@ class Player {
     }
     return false;
   }
+  
+  fight(){
+    
+    
+    
+  }
 }
 
 let game = new Game(artiRamas, armiList);
@@ -477,7 +592,7 @@ submit.addEventListener('click', () => {
     let player = new Player( play, armiList );
     player.init();
   }
-})
+});
 
 
 // resSpan.innerHTML = res;

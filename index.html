@@ -26,11 +26,11 @@
     
     <div class="caratteristiche form-block block">
       <h2>Caratteristiche</h2>
-      <label class="combattivita"> Combattività 
+      <label class="combattivita"> Combattività
         <span class="result"></span>
         <button>🎲</button>
       </label>
-      <label class="resistenza"> Resistenza 
+      <label class="resistenza"> Resistenza
         <span class="result"></span>
         <button>🎲</button>
       </label>
@@ -41,14 +41,23 @@
       <p id="scherma-res"></p>
     </div>
     
+    <div class="caratteristiche form-block block goldCoin">
+      <label>
+        Lancia per le Corone d'oro
+        <button>🎲</button>
+      </label>
+      <h3></h3>
+    </div>
+    
     <div class="caratteristiche form-block block">
       <h2></h2>
-      <label id="find" class="oggettoTrovato"> 
+      <label id="find" class="oggettoTrovato">
         Cerca tra le macerie
         <button id="find-btn">🎲</button>
       </label>
       <h3 id="find-it"></h3>
     </div>
+    
     <button id="submit"> Gioca </button>
   </div>
   
@@ -71,18 +80,25 @@
       <h4>Arti ramas</h4>
       <ol class="arti">
       </ol>
+      <h4>Armi</h4>
       <ol class="armamento"></ol>
       <h4>Zaino</h4>
       <div class="zaino">
         <h5>Oggetti</h5>
-        <ol></ol>
-        <h5>Pasti</h5>
-        <ol></ol>
+        <ol class="oggetti"></ol>
+        <h3>Pozioni:
+          <span class="pozione"></span>
+        </h3>
+        <h3>Pasti:
+          <span class="pasti"></span>
+        </h3>
+      </div>
+      <div class="borsa">
+        <label>Corone d'oro: <span></span></label>
       </div>
       <h4>Oggetti Speciali</h4>
-      <ul class="oggetti-speciali">
-        
-      </ul>
+      <ul class="oggettiSpeciali"></ul>
+      
       
     </div>
     <div id="note">
@@ -91,8 +107,34 @@
         
       </ul>
     </div>
-  </div>
+  </div> <!-- #Game -->
   
+  <div id="combattimento">
+    <h2>Nemico</h2>
+    <div class="EnemyComb">
+      <label>Combattività</label>
+      <input type="number">
+    </div>
+    <div class="EnemyRes">
+      <label>Resistenza</label>
+      <input type="number">
+    </div>
+    <div class="checkbox">
+      <label class="container">
+        Usa lo psicolaser
+        <input type="checkbox" name="checkbox" id="enemy-psicolaser">
+        <span class="checkmark"></span>
+      </label>
+    </div>
+    <div class="checkbox">
+      <label class="container">
+        Immune allo psicolaser
+        <input type="checkbox" name="checkbox" id="enemy-psicoScudo">
+        <span class="checkmark"></span>
+      </label>
+    </div>
+    <button id="fight"> Fight </button>
+  </div>
   
   
   <script src="js/main.js"></script>
