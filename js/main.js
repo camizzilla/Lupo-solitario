@@ -120,7 +120,7 @@ class Game  {
         this.reset(this.validator);
       }
       let creazioneDiv = document.querySelector(`#creazione`);
-      creazioneDiv.classList.add('fadeOut');
+      // creazioneDiv.classList.add('fadeOut');
       setTimeout(() => {creazioneDiv.classList.add('hidden')}, 2000);
       document.querySelector(`#game`).classList.add('fadeIn');
       return this.playerRes;
@@ -602,23 +602,28 @@ class Player {
         this.aggiornaCaratteristiche();
       }
       
-      console.log("enemy2:::", enemy);
-      console.log("this.combattivita:::", this.combattivita);
+      let differenzaForza = this.combattivita - enemy.combattivita;
       
       let Enemys = new Enemy(
         enemy.combattivita,
-        enemy.resistenza
+        enemy.resistenza,
+        differenzaForza,
+        this
       );
       
-      
-      let differenzaForza = this.combattivita - enemy.combattivita;
-      
-      let rapportoForza = this.rapportoForza(differenzaForza);
-      let dice = this.dice();
-      console.log(`il dado:::: ${dice }`);
-      console.log("rapportoForza:: ", this.risultatiCombattimento[dice -1][rapportoForza]);
-      
     });
+  }
+  
+  scontro( differenzaForza ){
+      let dice = this.dice();
+      let rapportoForza = this.rapportoForza(differenzaForza)
+      console.log("differenza Forza:::", rapportoForza);
+      let res = this.risultatiCombattimento[dice][rapportoForza];
+      console.log("result:::", res);
+      
+      this.resistenza -= res.ls;
+      this.aggiornaCaratteristiche();
+      return res.n;
   }
   
   getEnemyValue(elem, type){
@@ -696,11 +701,13 @@ class Player {
  * ***********************  *
  ****************************/ 
 class Enemy {
-  constructor(combattivita, resistenza){
+  constructor(combattivita, resistenza, differenzaForza, player){
     this.combattivita = combattivita;
     this.resistenza = resistenza;
     this.combattivitaList = document.querySelector("ul.enemy-list");
     this.create();
+    this.player = player;
+    this.differenzaForza = differenzaForza;
   }
   
   create(){
@@ -708,14 +715,15 @@ class Enemy {
     
     let p1 = document.createElement("p");
     p1.innerHTML = "Combattività: ";
-    let span1 = document.createElement("span", ['enemy-comb']);
+    let span1 = document.createElement("span");
     span1.innerHTML = this.combattivita;
     p1.appendChild(span1);
     li.appendChild(p1);
     
     let p2 = document.createElement("p");
     p2.innerHTML = "Resistenza: ";
-    let span2 = document.createElement("span", ['enemy-res']);
+    let span2 = document.createElement("span");
+    span2.classList.add('enemy-res');
     span2.innerHTML = this.resistenza;
     p2.appendChild(span2);
     li.appendChild(p2);
@@ -729,7 +737,7 @@ class Enemy {
     
     btn.addEventListener('click', () =>{
       this.attacca();
-    })
+    });
   }
   
   appendoToList(elem){
@@ -737,22 +745,32 @@ class Enemy {
   }
   
   printResistenza(){
-    let res = document.getElementsByClassName('enemy-res');
-    res.innerHtml = this.resistenza;
+    let res = document.querySelector('.enemy-res');
+    res.innerHTML = this.resistenza;
   }
   
-  calcResistenza(danno){
-    this.resistenza -= danno;
+  attacca(){
+    let puntiFerita = this.player.scontro(this.differenzaForza);
+    this.calcResistenza(puntiFerita);
+  }
+  
+  calcResistenza(puntiFerita){
+    console.log( `Resistenza : ${this.resistenza} 
+      puntiFerita ${puntiFerita}
+    `)
+    
+    this.resistenza -= puntiFerita;
+    
     if(this.resistenza <= 0){
       console.log('nemico Morto');
+      this.resistenza = 0;
+      this.printResistenza();
     }else {
+      console.log( `Resistenza : ${this.resistenza}`);
       this.printResistenza();
     }
   }
   
-  attacca(){
-    console.log('attacca');
-  }
 }
 
 

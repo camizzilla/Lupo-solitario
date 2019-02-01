@@ -149,9 +149,9 @@ label {
     opacity: 0;}
 }
 
-#game {
-  opacity: 0;
-}
+/*#game {*/
+/*  opacity: 0;*/
+/*}*/
 
 #game.fadeIn{
   position: relative;
