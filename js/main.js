@@ -120,9 +120,9 @@ class Game  {
         this.reset(this.validator);
       }
       let creazioneDiv = document.querySelector(`#creazione`);
-      // creazioneDiv.classList.add('fadeOut');
+      creazioneDiv.classList.add('slide-out-right');
       setTimeout(() => {creazioneDiv.classList.add('hidden')}, 2000);
-      document.querySelector(`#game`).classList.add('fadeIn');
+      document.querySelector(`#game`).classList.add('slide-in-left');
       return this.playerRes;
     }
   }
@@ -442,6 +442,8 @@ class Player {
     ];
     this.combElem = document.querySelector(".comb h4");
     this.resElem = document.querySelector(".res h4");
+    
+    this.enemyId = 0;
   }
   
   init(){
@@ -454,7 +456,7 @@ class Player {
     this.borsello();
     this.aggiungiOggettiSpeciali();
     
-    this.fight();
+    this.addEnemy();
     this.throwDice();
   }
   
@@ -581,49 +583,69 @@ class Player {
     return false;
   }
   
-  fight(){
-    document.querySelector("#fight").addEventListener('click', ()=>{
+  addEnemy(){
+    let error = document.querySelector("#combattimento .error");
+    let addEnemyBtn = document.querySelector("#addEnemy");
+    let formCombattimento = document.querySelector("#combattimento");
+    addEnemyBtn.addEventListener('click', ()=>{
       
       let enemy = {
-        combattivita : Number( this.getEnemyValue(".EnemyComb input", "value")),
-        resistenza : Number( this.getEnemyValue(".EnemyRes input", "value")),
+        combattivita : parseInt( this.getEnemyValue(".EnemyComb input", "value")),
+        resistenza : parseInt( this.getEnemyValue(".EnemyRes input", "value")),
         psicoLaser: this.getEnemyValue("#enemy-psicolaser", "checked"),
         psicoSchermo: this.getEnemyValue("#enemy-psicoScudo", "checked")
       };
-      console.log("enemy:::", enemy);
-      
-      if(enemy.psicoLaser && !this.iHavePsico("Psicoschermo")) {
-        this.combattivita -= 2;
-        this.aggiornaCaratteristiche();
+      if(enemy.combattivita && enemy.resistenza){
+        if(formCombattimento.classList.contains("error")) formCombattimento.classList.remove("error");
+        error.classList.add('hidden');
+        
+        if(enemy.psicoLaser && !this.iHavePsico("Psicoschermo")) {
+          this.combattivita -= 2;
+          this.aggiornaCaratteristiche();
+        }
+        
+        if(enemy.psicoSchermo && this.iHavePsico("Psicolaser")) {
+          this.combattivita -= 2;
+          this.aggiornaCaratteristiche();
+        }
+        
+        let differenzaForza = this.combattivita - enemy.combattivita;
+        
+        let Enemys = new Enemy(
+          this.enemyId++,
+          enemy.combattivita,
+          enemy.resistenza,
+          differenzaForza,
+          this
+        );
+        this.resetValue(".EnemyComb input");
+        this.resetValue(".EnemyRes input");
+      }else {
+        formCombattimento.classList.add("error");
+        error.innerHTML = "Completare il form";
+        error.classList.remove('hidden');
       }
-      
-      if(enemy.psicoSchermo && this.iHavePsico("Psicolaser")) { 
-        this.combattivita -= 2;
-        this.aggiornaCaratteristiche();
-      }
-      
-      let differenzaForza = this.combattivita - enemy.combattivita;
-      
-      let Enemys = new Enemy(
-        enemy.combattivita,
-        enemy.resistenza,
-        differenzaForza,
-        this
-      );
-      
     });
   }
   
   scontro( differenzaForza ){
-      let dice = this.dice();
-      let rapportoForza = this.rapportoForza(differenzaForza)
-      console.log("differenza Forza:::", rapportoForza);
-      let res = this.risultatiCombattimento[dice][rapportoForza];
-      console.log("result:::", res);
-      
+    let dice = this.dice();
+    let rapportoForza = this.rapportoForza(differenzaForza);
+    console.log("differenza Forza:::", rapportoForza);
+    let res = this.risultatiCombattimento[dice][rapportoForza];
+    console.log("result:::", res);
+    if(res.ls !== "M") {
       this.resistenza -= res.ls;
+    } else {
+      this.resistenza = 0;
+    }
+    if(this.resistenza >= 0){
       this.aggiornaCaratteristiche();
-      return res.n;
+    }else {
+      document.querySelector('#game-over').classList.remove('hidden');
+      this.reset();
+    }
+    return res.n;
   }
   
   getEnemyValue(elem, type){
@@ -632,6 +654,10 @@ class Player {
     }else if (type === "checked"){
       return document.querySelector(elem).checked;
     }
+  }
+  
+  resetValue(elem){
+    document.querySelector(elem).value = "";
   }
   
   iHavePsico(psicoWeapon){
@@ -643,7 +669,9 @@ class Player {
     }
   }
   
-  
+  reset(){
+    
+  }
   
   rapportoForza(differenzaForza){
     
@@ -699,9 +727,10 @@ class Player {
 }
 /****************************
  * ***********************  *
- ****************************/ 
+****************************/
 class Enemy {
-  constructor(combattivita, resistenza, differenzaForza, player){
+  constructor(id, combattivita, resistenza, differenzaForza, player){
+    this.id = id;
     this.combattivita = combattivita;
     this.resistenza = resistenza;
     this.combattivitaList = document.querySelector("ul.enemy-list");
@@ -723,7 +752,7 @@ class Enemy {
     let p2 = document.createElement("p");
     p2.innerHTML = "Resistenza: ";
     let span2 = document.createElement("span");
-    span2.classList.add('enemy-res');
+    span2.classList.add(`enemy-res-${this.id}`);
     span2.innerHTML = this.resistenza;
     p2.appendChild(span2);
     li.appendChild(p2);
@@ -745,7 +774,7 @@ class Enemy {
   }
   
   printResistenza(){
-    let res = document.querySelector('.enemy-res');
+    let res = document.querySelector(`.enemy-res-${this.id}`);
     res.innerHTML = this.resistenza;
   }
   
@@ -755,9 +784,9 @@ class Enemy {
   }
   
   calcResistenza(puntiFerita){
-    console.log( `Resistenza : ${this.resistenza} 
+    console.log( `Resistenza : ${this.resistenza}
       puntiFerita ${puntiFerita}
-    `)
+    `);
     
     this.resistenza -= puntiFerita;
     
