@@ -447,7 +447,6 @@ class Player {
   }
   
   init(){
-    let that = this;
     this.controlObj();
     this.addArmi();
     this.aggiungiArtiRamas();
@@ -455,6 +454,7 @@ class Player {
     this.zainoFunc();
     this.borsello();
     this.aggiungiOggettiSpeciali();
+    this.ctrlResComb();
     
     this.addEnemy();
     this.throwDice();
@@ -483,6 +483,34 @@ class Player {
   aggiornaCaratteristiche(){
     this.print(this.combElem, this.combattivita);
     this.print(this.resElem, this.resistenza);
+    if(this.resistenza <= 0){
+      this.resistenza = 0;
+      this.gameOver();
+    }
+  }
+  
+  ctrlResComb(){
+    let btnPlusRes = document.querySelector(".res-plus");
+    let btnMinusRes = document.querySelector(".res-minus");
+    let btnPlusComb = document.querySelector(".comb-plus");
+    let btnMinusComb = document.querySelector(".comb-minus");
+    
+    btnPlusRes.addEventListener('click', () => {
+      this.resistenza++;
+      this.aggiornaCaratteristiche();
+    });
+    btnMinusRes.addEventListener('click', () => {
+      this.resistenza--;
+      this.aggiornaCaratteristiche();
+      });
+    btnPlusComb.addEventListener('click', () => { 
+      this.combattivita++;
+      this.aggiornaCaratteristiche();
+    }); 
+    btnMinusComb.addEventListener('click', () => { 
+      this.combattivita--;
+      this.aggiornaCaratteristiche();
+      }); 
   }
   
   addArmi(){
@@ -642,10 +670,14 @@ class Player {
     if(this.resistenza >= 0){
       this.aggiornaCaratteristiche();
     }else {
-      document.querySelector('#game-over').classList.remove('hidden');
-      this.reset();
+      this.gameOver();
     }
     return res.n;
+  }
+  
+  gameOver(){
+    document.querySelector('#game-over').classList.remove('hidden');
+    this.reset();
   }
   
   getEnemyValue(elem, type){
