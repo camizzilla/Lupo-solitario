@@ -502,27 +502,84 @@ class Player {
     btnMinusRes.addEventListener('click', () => {
       this.resistenza--;
       this.aggiornaCaratteristiche();
-      });
-    btnPlusComb.addEventListener('click', () => { 
+    });
+    btnPlusComb.addEventListener('click', () => {
       this.combattivita++;
       this.aggiornaCaratteristiche();
-    }); 
-    btnMinusComb.addEventListener('click', () => { 
+    });
+    btnMinusComb.addEventListener('click', () => {
       this.combattivita--;
       this.aggiornaCaratteristiche();
-      }); 
+    });
   }
   
   addArmi(){
-    let listElement = document.querySelector('#registro-guerra .armamento');
-    
+    let list = document.querySelector('#registro-guerra .armamento');
+     this.btnAddItem(list);
     if(this.armi.length){
       this.armi.forEach( (arma) => {
-        let list = document.createElement('li',['arma']);
-        list.innerHTML = arma;
-        listElement.appendChild(list);
+       this.addItemList(arma, "armi", list)
       });
     }
+  }
+  
+  addItemList(className, arrayName, list){
+    let item = document.createElement('li');
+    item.innerHTML = className;
+    this.addBtnCanc(item, arrayName, className, list);
+    list.appendChild(item);
+  }
+  
+  //
+  addBtnCanc(item, arrayName, element, list){
+    let btn = document.createElement('button');
+    btn.innerHTML = "remove";
+    item.appendChild(btn);
+    
+    btn.addEventListener('click', () => {
+      const index = this[arrayName].indexOf(element);
+      this[arrayName].splice(index, 1);
+      list.removeChild(item);
+    });
+  }
+  
+  btnAddItem(list){
+    let btn = document.createElement('button');
+    btn.innerHTML = "add";
+    
+    let form = this.inputForm("weapon", "armi", list);
+    
+    list.appendChild(btn);
+    list.appendChild(form);
+    
+    
+    btn.addEventListener('click', () => {
+      form.classList.remove('hidden');
+      btn.classList.add('hidden');
+    });
+  }
+  
+  inputForm(className, arrayName, list){
+    let div = document.createElement('div');
+    div.classList.add('hidden', className);
+
+    let input = document.createElement('input');
+    let btn = document.createElement('button');
+    btn.innerHTML = "Add";
+    
+    div.appendChild(input);
+    div.appendChild(btn);
+    
+    btn.addEventListener('click', () => {
+      let value = input.value;
+      if(value) this.addInputArray(arrayName, value);
+      this.addItemList(value, "armi", list)
+    });
+    return div;
+  }
+  
+  addInputArray(array, value){
+    this[array].push(value);
   }
   
   aggiungiArtiRamas(){
@@ -756,7 +813,12 @@ class Player {
     // console.log(`${res -1}, ${rapportoForza}`);
     return res > 9 ? 9 : res;
   }
+  
+  
+  
+  
 }
+
 /****************************
  * ***********************  *
 ****************************/

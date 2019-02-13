@@ -67,11 +67,19 @@
       <ul>
         <li class="comb">
           <label>Combattività</label>
-          <h4></h4>
+          <div>
+            <button class="comb-plus"> + </button>
+            <h4></h4>
+            <button class="comb-minus"> - </button>
+          </div>
         </li>
         <li class="res">
           <label>Resistenza</label>
-          <h4></h4>
+          <div>
+            <button class="res-plus"> + </button>
+            <h4></h4>
+            <button class="res-minus"> - </button>
+          </div>
         </li>
       </ul>
     </div>
@@ -133,9 +141,22 @@
         <span class="checkmark"></span>
       </label>
     </div>
-    <button id="fight"> Fight </button>
-  </div>
+    <button id="addEnemy"> add Enemy </button>
+    <p class="error hidden"></p>
+    <ul class="enemy-list"></ul>
+  </div><!--#combattimento-->
   
+  <div id="throw-dice">
+    <label> Lancia il dado
+      <span class="result"></span>
+      <button class="dice">🎲</button>
+      <button class="reset">Reset</button>
+    </label>
+  </div><!--#throwDice-->
+  
+  <div id="game-over" class="hidden">
+    <h1>Sei morto!!!</h1>
+  </div>
   
   <script src="js/main.js"></script>
   
