@@ -425,17 +425,20 @@ class Player {
     this.risultatiCombattimento = risultatiCombattimento;
     
     this.oggettoTrovato = oggettoTrovato;
-    this.zaino = {
-      pasti: 1,
-      pozione: 0,
-      oggetti: []
-    };
+    
+    this.itemInBag = 0;
+    this.pasti = 1;
+    this.pozione = 10;
+    this.oggetti = [];
+    
     this.armiList = armiList;
     this.armi = ["Ascia"];
     
     this.borsa = {
       coroneOro : goldCoin
     };
+    
+    this.goldCoins = goldCoin;
     
     this.oggettiSpeciali = [
       "Mappa di Summerlund"
@@ -451,7 +454,9 @@ class Player {
     this.addArmi();
     this.aggiungiArtiRamas();
     this.aggiornaCaratteristiche();
-    this.zainoFunc();
+    this.printPotions();
+    this.printFood();
+    this.printItems();
     this.borsello();
     this.aggiungiOggettiSpeciali();
     this.ctrlResComb();
@@ -472,11 +477,11 @@ class Player {
       this.oggettiSpeciali.push(this.oggettoTrovato);
       this.resistenza += 4;
     }else if( "Pasti" === this.oggettoTrovato){
-      this.zaino.pasti += 2;
+      this.pasti += 2;
     }else if( "Corone d'oro" === this.oggettoTrovato){
-      this.borsa.coroneOro += 12;
+      this.goldCoins += 12;
     }else if( "Pozione" === this.oggettoTrovato){
-      this.zaino.pozione += 1;
+      this.pozione += 1;
     }
   }
   
@@ -515,23 +520,25 @@ class Player {
   
   addArmi(){
     let list = document.querySelector('#registro-guerra .armamento');
-     this.btnAddItem(list);
+    
+    let btnPLus = this.btnAddItem(list);
+    
     if(this.armi.length){
       this.armi.forEach( (arma) => {
-       this.addItemList(arma, "armi", list)
+        this.addItemList(arma, "armi", list, btnPLus);
       });
     }
   }
   
-  addItemList(className, arrayName, list){
+  addItemList(className, arrayName, list, btnPLus){
     let item = document.createElement('li');
     item.innerHTML = className;
-    this.addBtnCanc(item, arrayName, className, list);
+    this.addBtnCanc(item, arrayName, className, list, btnPLus);
     list.appendChild(item);
   }
   
   //
-  addBtnCanc(item, arrayName, element, list){
+  addBtnCanc(item, arrayName, element, list, btnPLus){
     let btn = document.createElement('button');
     btn.innerHTML = "remove";
     item.appendChild(btn);
@@ -540,29 +547,37 @@ class Player {
       const index = this[arrayName].indexOf(element);
       this[arrayName].splice(index, 1);
       list.removeChild(item);
+      if(this.maxItem(arrayName, 2)){
+        btnPLus.classList.remove('hidden');
+      }
     });
   }
   
   btnAddItem(list){
     let btn = document.createElement('button');
-    btn.innerHTML = "add";
+    btn.innerHTML = "+";
     
-    let form = this.inputForm("weapon", "armi", list);
+    if(!this.maxItem("armi", 2)){
+      btn.classList.add('hidden');
+    }
     
-    list.appendChild(btn);
-    list.appendChild(form);
+    let form = this.inputForm("weapon", "armi", list, btn);
     
+    list.before(btn);
+    list.before(form);
     
     btn.addEventListener('click', () => {
       form.classList.remove('hidden');
       btn.classList.add('hidden');
     });
+    
+    return btn;
   }
   
-  inputForm(className, arrayName, list){
+  inputForm(className, arrayName, list, addItem){
     let div = document.createElement('div');
     div.classList.add('hidden', className);
-
+    
     let input = document.createElement('input');
     let btn = document.createElement('button');
     btn.innerHTML = "Add";
@@ -573,7 +588,10 @@ class Player {
     btn.addEventListener('click', () => {
       let value = input.value;
       if(value) this.addInputArray(arrayName, value);
-      this.addItemList(value, "armi", list)
+      this.addItemList(value, "armi", list, addItem);
+      div.classList.add('hidden');
+      input.value = "";
+      if(this.maxItem(arrayName, 2)) addItem.classList.remove('hidden');
     });
     return div;
   }
@@ -582,6 +600,45 @@ class Player {
     this[array].push(value);
   }
   
+  btnPlusMinus(className, objName, elem){
+    let div = document.createElement('div');
+    div.classList.add(className);
+    let btnPlus = document.createElement('button');
+    btnPlus.innerHTML = "+";
+    let btnMinus = document.createElement('button');
+    btnMinus.innerHTML = "-";
+    
+    div.appendChild(btnPlus);
+    div.appendChild(btnMinus);
+    
+    btnPlus.addEventListener('click', () => {
+      this.addOne(objName);
+      this.update(objName, elem);
+    });
+    btnMinus.addEventListener('click', () => {
+      this.subtractOne(objName);
+      this.update(objName, elem);
+    });
+    
+    return div;
+  }
+  
+  update(objName, elem){
+    elem.innerHTML = this[objName];
+  }
+  
+  
+  addOne(objName){
+    this[objName]++;
+  }
+  
+  subtractOne(objName){
+    if(this[objName] > 0){
+      this[objName]--;
+    } else {
+      this[objName] = 0;
+    }
+  }
   aggiungiArtiRamas(){
     let listElement = document.querySelector('#registro-guerra .arti');
     
@@ -595,25 +652,29 @@ class Player {
       });
     }
   }
+  printPotions(){
+    let potions = this.printQuery(".zaino .potions", this.pozione);
+    potions.elem.appendChild(this.btnPlusMinus("potions", "pozione", potions.span));
+  }
   
-  zainoFunc(){
-    this.printQuery(".zaino .pozione", this.zaino.pozione);
-    this.printQuery(".zaino .pasti", this.zaino.pasti);
-    
-    let listElement = document.querySelector('.zaino ol.oggetti');
-    if(this.zaino.oggetti.length){
-      this.zaino.oggetti.forEach( oggetto => {
-        let list = document.createElement('li',['oggetto']);
-        list.innerHTML = oggetto;
-        listElement.appendChild(list);
-        
-        this.filtroArtiRamas(arte);
+  printFood(){
+    let food = this.printQuery(".zaino .foods", this.pasti);
+    food.elem.appendChild(this.btnPlusMinus("foods", "pasti", food.span));
+  }
+  
+  printItems(){
+    let list = document.querySelector('.zaino ol.items');
+    this.btnAddItem(list);
+    if(this.oggetti.length){
+      this.oggetti.forEach( oggetto => {
+        this.addItemList(oggetto, "oggetti", list);
       });
     }
   }
   
   borsello(){
-    this.printQuery(".borsa label span", this.borsa.coroneOro);
+    let goldCoins = this.printQuery(".borsa label", this.goldCoins);
+    goldCoins.elem.appendChild(this.btnPlusMinus("goldcoin", "goldCoins", goldCoins.span));
   }
   
   aggiungiOggettiSpeciali(){
@@ -626,6 +687,15 @@ class Player {
         listElement.appendChild(list);
         
       });
+    }
+  }
+  
+  maxItem(arrayName, max){
+    let length = this[arrayName].length;
+    if(length < max){
+      return true;
+    }else {
+      return false;
     }
   }
   
@@ -655,7 +725,13 @@ class Player {
   //TOOL
   printQuery(query, value){
     let element = document.querySelector(query);
-    this.print(element, value);
+    let span = document.createElement('span');
+    element.appendChild(span);
+    this.print(span, value);
+    return {
+      span:span,
+      elem: element
+    };
   }
   
   print(elem, value){
