@@ -428,8 +428,10 @@ class Player {
     
     this.itemInBag = 0;
     this.pasti = 1;
-    this.pozione = 10;
+    this.pozione = 0;
     this.oggetti = [];
+    
+    this.maxItems = 9;
     
     this.armiList = armiList;
     this.armi = ["Ascia"];
@@ -519,26 +521,27 @@ class Player {
   }
   
   addArmi(){
+    let maxItems = 2;
     let list = document.querySelector('#registro-guerra .armamento');
     
-    let btnPLus = this.btnAddItem(list);
+    let btnPLus = this.btnAddItem(list, maxItems, "armi");
     
     if(this.armi.length){
       this.armi.forEach( (arma) => {
-        this.addItemList(arma, "armi", list, btnPLus);
+        this.addItemList(arma, "armi", list, btnPLus, maxItems);
       });
     }
   }
   
-  addItemList(className, arrayName, list, btnPLus){
+  addItemList(className, arrayName, list, btnPLus, maxItems){
     let item = document.createElement('li');
     item.innerHTML = className;
-    this.addBtnCanc(item, arrayName, className, list, btnPLus);
+    this.addBtnCanc(item, arrayName, className, list, btnPLus, maxItems);
     list.appendChild(item);
   }
   
   //
-  addBtnCanc(item, arrayName, element, list, btnPLus){
+  addBtnCanc(item, arrayName, element, list, btnPLus, maxItems){
     let btn = document.createElement('button');
     btn.innerHTML = "remove";
     item.appendChild(btn);
@@ -547,21 +550,21 @@ class Player {
       const index = this[arrayName].indexOf(element);
       this[arrayName].splice(index, 1);
       list.removeChild(item);
-      if(this.maxItem(arrayName, 2)){
+      if(this.maxItem(arrayName, maxItems)){
         btnPLus.classList.remove('hidden');
       }
     });
   }
   
-  btnAddItem(list){
+  btnAddItem(list, maxItems, arrayName){
     let btn = document.createElement('button');
     btn.innerHTML = "+";
     
-    if(!this.maxItem("armi", 2)){
+    if(!this.maxItem(arrayName, maxItems)){
       btn.classList.add('hidden');
     }
     
-    let form = this.inputForm("weapon", "armi", list, btn);
+    let form = this.inputForm(arrayName, arrayName, list, btn, maxItems);
     
     list.before(btn);
     list.before(form);
@@ -574,7 +577,7 @@ class Player {
     return btn;
   }
   
-  inputForm(className, arrayName, list, addItem){
+  inputForm(className, arrayName, list, addItem, maxItems){
     let div = document.createElement('div');
     div.classList.add('hidden', className);
     
@@ -588,10 +591,10 @@ class Player {
     btn.addEventListener('click', () => {
       let value = input.value;
       if(value) this.addInputArray(arrayName, value);
-      this.addItemList(value, "armi", list, addItem);
+      this.addItemList(value, "armi", list, addItem, maxItems);
       div.classList.add('hidden');
       input.value = "";
-      if(this.maxItem(arrayName, 2)) addItem.classList.remove('hidden');
+      if(this.maxItem(arrayName, maxItems)) addItem.classList.remove('hidden');
     });
     return div;
   }
@@ -600,7 +603,7 @@ class Player {
     this[array].push(value);
   }
   
-  btnPlusMinus(className, objName, elem){
+  btnPlusMinus(className, objName, elem, maxItems){
     let div = document.createElement('div');
     div.classList.add(className);
     let btnPlus = document.createElement('button');
@@ -612,14 +615,27 @@ class Player {
     div.appendChild(btnMinus);
     
     btnPlus.addEventListener('click', () => {
-      this.addOne(objName);
-      this.update(objName, elem);
+      if( !this.checkBag(objName)){
+        this.addOne(objName);
+        this.update(objName, elem);
+      } else {
+        if(this.maxItem(objName, maxItems)){
+          this.addOne(objName);
+          this.update(objName, elem);
+        } else {
+          this.btnAddItems.classList.add('hidden');
+        }
+      }
+      
     });
     btnMinus.addEventListener('click', () => {
       this.subtractOne(objName);
       this.update(objName, elem);
+      
+      if( this.checkBag(objName) && this.maxItem(objName, maxItems)){
+        this.btnAddItems.classList.remove('hidden');
+      }
     });
-    
     return div;
   }
   
@@ -653,21 +669,26 @@ class Player {
     }
   }
   printPotions(){
+    let maxItems = this.maxItems;
     let potions = this.printQuery(".zaino .potions", this.pozione);
-    potions.elem.appendChild(this.btnPlusMinus("potions", "pozione", potions.span));
+    let btnPlusMinus = this.btnPlusMinus("potions", "pozione", potions.span, maxItems);
+    potions.elem.appendChild(btnPlusMinus);
   }
   
   printFood(){
+    let maxItems = this.maxItems;
     let food = this.printQuery(".zaino .foods", this.pasti);
-    food.elem.appendChild(this.btnPlusMinus("foods", "pasti", food.span));
+    let btnPlusMinus = this.btnPlusMinus("foods", "pasti", food.span, maxItems);
+    food.elem.appendChild( btnPlusMinus );
   }
   
   printItems(){
+    let maxItem = this.maxItems;
     let list = document.querySelector('.zaino ol.items');
-    this.btnAddItem(list);
+    this.btnAddItems = this.btnAddItem(list, maxItem, "oggetti");
     if(this.oggetti.length){
       this.oggetti.forEach( oggetto => {
-        this.addItemList(oggetto, "oggetti", list);
+        this.addItemList(oggetto, "oggetti", list, this.btnAddItems, maxItem);
       });
     }
   }
@@ -690,8 +711,21 @@ class Player {
     }
   }
   
+  checkBag(arrayName){
+    return arrayName == "pasti" || arrayName == "pozione" || arrayName == "oggetti";
+  }
+  
+  lengthItems(arrayName){
+    if(this.checkBag(arrayName)){
+      return this.oggetti.length + this.pasti + this.pozione;
+    }else {
+      return this[arrayName].length;
+    }
+  }
+  
   maxItem(arrayName, max){
-    let length = this[arrayName].length;
+    let length = this.lengthItems(arrayName);
+    
     if(length < max){
       return true;
     }else {
