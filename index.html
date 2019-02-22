@@ -8,20 +8,38 @@
 </head>
 <body>
   
-  <div id="creazione" name="creazione">
+  <div id="main">
+    
+    <!-- Form che genera il personaggio -->
+    <ul class="character-generator">
+      
+      <li class="difficulty form-block">
+        
+        <h2>Livello di difficoltà</h2>
+        <div class="radio">
+          
+          <label class="container">Facile
+            <input id="easy" type="radio" checked="checked" name="radio">
+            <span class="checkmark"></span>
+          </label>
+          
+          <label class="container">Difficile
+            <input id="hard" type="radio" name="radio">
+            <span class="checkmark"></span>
+          </label>
+          
+        </div> <!-- radio -->
+        
+      </li> <!--.difficulty-->
+      
+    </ul> <!--.character-generator-->
+    
+  </div> <!--#main-->
+  
+  <div id="" name="creazione">
     
     <div class="livello form-block">
-      <h2>Livello di difficoltà</h2>
-      <div class="radio">
-        <label class="container">Facile
-          <input id="facile" type="radio" checked="checked" name="radio">
-          <span class="checkmark"></span>
-        </label>
-        <label class="container">Difficile
-          <input id="difficile" type="radio" name="radio">
-          <span class="checkmark"></span>
-        </label>
-      </div>
+      
     </div>  <!-- livello -->
     
     <div class="caratteristiche form-block block">
@@ -98,7 +116,7 @@
         <h3 class="foods">Pasti:</h3>
       </div>
       <div class="borsa">
-        <label>Corone d'oro:</label>
+        <h3>Corone d'oro:</h3>
       </div>
       <h4>Oggetti Speciali</h4>
       <ul class="oggettiSpeciali"></ul>

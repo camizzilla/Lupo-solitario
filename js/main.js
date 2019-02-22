@@ -1,3 +1,4 @@
+//Lista delle arti ramas
 const artiRamas = [
   "Mimetismo",
   "Caccia",
@@ -11,6 +12,7 @@ const artiRamas = [
   "Telecinesi"
 ];
 
+//Lista delle armi
 const armiList = [
   "Pugnale",
   "Lancia",
@@ -24,6 +26,21 @@ const armiList = [
   "Spadone"
 ];
 
+//Lista degli oggetti che si possono trovare sotto le macerie
+const itemsUnderRuins = [
+  "Spada",
+  "Elmo",
+  "Pasti",
+  "Cotta di maglia",
+  "Mazza",
+  "Pozione magica",
+  "Asta",
+  "Lancia",
+  "Corone d'oro",
+  "Spadone"
+];
+
+//Matrice per il calcolo del risultato del combattimaneto
 const risultatiCombattimento = [
   [{n: 0, ls: "M"},{n: 0, ls: "M"},{n: 0, ls: 8},{n: 0, ls: 6},{n: 1, ls: 6},{n: 3, ls: 5},{n: 4, ls: 5},{n: 5, ls: 4},{n: 6, ls: 4},{n: 7, ls: 4},{n: 8, ls: 3},{n: 9, ls: 3}],
   [{n: 0, ls: "M"},{n: 0, ls: 8},{n: 0, ls: 7},{n: 1, ls: 6},{n: 2, ls: 5},{n: 4, ls: 4},{n: 5, ls: 4},{n: 6, ls: 3},{n: 7, ls: 3},{n: 8, ls: 3},{n: 9, ls: 3},{n: 10, ls: 2}],
@@ -37,14 +54,16 @@ const risultatiCombattimento = [
   [{n: 6, ls: 0},{n: 7, ls: 0},{n: 8, ls: 0},{n: 9, ls: 0},{n: 10, ls: 0},{n: 12, ls: 0},{n: 14, ls: 0},{n: 16, ls: 0},{n: 18, ls: 0},{n: "M", ls: 0},{n: "M", ls: 0},{n: "M", ls: 0}]
 ];
 
-class Game  {
-  constructor(artiRamas, armiList){
-    this.livello = true;
+//Classe che gestisce il form per la creazione del personaggio
+class CharacterGenerator  {
+  constructor(artiRamas, armiList, itemsUnderRuins){
+    
+    this.difficulty = true;
     this.livelloFacile = 3;
     this.validator = [];
     
     this.playerRes = {
-      livello: this.livello,
+      difficulty: this.difficulty,
       combattivita: '',
       resistenza: '',
       artiRamas: [],
@@ -52,25 +71,15 @@ class Game  {
       arma: '',
       goldCoin: ''
     };
+    
     this.artiRamas = artiRamas;
     this.armi = armiList;
-    this.oggettiTrovati = [
-      "Spada",
-      "Elmo",
-      "Pasti",
-      "Cotta di maglia",
-      "Mazza",
-      "Pozione magica",
-      "Asta",
-      "Lancia",
-      "Corone d'oro",
-      "Spadone"
-    ];
+    this.oggettiTrovati = itemsUnderRuins;
   }
   
   formComponent(){
-    let facile = document.getElementById('facile');
-    let difficile = document.getElementById('difficile');
+    let facile = document.getElementById('easy');
+    let difficile = document.getElementById('hard');
     let reset = true;
     this.level(facile, difficile);
     this.addArtiRamas();
@@ -120,9 +129,9 @@ class Game  {
         this.reset(this.validator);
       }
       let creazioneDiv = document.querySelector(`#creazione`);
-      creazioneDiv.classList.add('slide-out-right');
-      setTimeout(() => {creazioneDiv.classList.add('hidden')}, 2000);
-      document.querySelector(`#game`).classList.add('slide-in-left');
+      // creazioneDiv.classList.add('slide-out-right');
+      // setTimeout(() => {creazioneDiv.classList.add('hidden')}, 2000);
+      // document.querySelector(`#game`).classList.add('slide-in-left');
       return this.playerRes;
     }
   }
@@ -130,13 +139,13 @@ class Game  {
   level(facile, difficile){
     facile.addEventListener('click', () => {
       if(facile.checked){
-        this.playerRes.livello = true;
+        this.playerRes.difficulty = true;
       }
     });
     
     difficile.addEventListener('click', () => {
       if(difficile.checked){
-        this.playerRes.livello = false;
+        this.playerRes.difficulty = false;
       }
     });
   }
@@ -694,8 +703,10 @@ class Player {
   }
   
   borsello(){
-    let goldCoins = this.printQuery(".borsa label", this.goldCoins);
-    goldCoins.elem.appendChild(this.btnPlusMinus("goldcoin", "goldCoins", goldCoins.span));
+    let maxCoin = 50;
+    let goldCoins = this.printQuery(".borsa h3", this.goldCoins);
+    let btnPlusMinus = this.btnPlusMinus("goldcoin", "goldCoins", goldCoins.span, maxCoin);
+    goldCoins.elem.appendChild(btnPlusMinus);
   }
   
   aggiungiOggettiSpeciali(){
@@ -1007,12 +1018,12 @@ class Enemy {
 }
 
 
-let game = new Game(artiRamas, armiList);
-game.formComponent();
+let characterGenerator = new CharacterGenerator(artiRamas, armiList, itemsUnderRuins);
+characterGenerator.formComponent();
 
 let submit = document.getElementById("submit");
 submit.addEventListener('click', () => {
-  let play = game.submitPlay();
+  let play = characterGenerator.submitPlay();
   if(play){
     let player = new Player( play, armiList, risultatiCombattimento );
     player.init();
