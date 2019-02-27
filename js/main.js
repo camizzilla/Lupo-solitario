@@ -65,16 +65,15 @@ class Tools {
   //Converte il nome di una variabile in un nome di una classe
   //Esempio nomeStringa => nome-stringa
   static convertStringInClassName( string ){
+    let stringElab = "";
     let regex = /[A-Z]/;
     for ( let key in string){
       let uppercase = regex.test(string[key]);
       if(uppercase){
-      string =  string.slice(0, key -1) + "-" + string.slice(key , string.lengt);
-      string[key].toLowerCase();
-      
+        stringElab =  string.slice(0, key) + "-" + string.slice(key, string.lengt);
       }
     }
-    return string.toLowerCase();
+    return stringElab.toLowerCase();
   }
   
 }
@@ -99,7 +98,7 @@ class CharacterGenerator  {
     
     this.kaiDisciplines = kaiDisciplinesList; //lista delle arti-ramas
     this.weapons = weaponsList; //lista delle armi
-    this.itemsUnderRuins = itemsUnderRuins; //lista degli oggetti 
+    this.itemsUnderRuins = itemsUnderRuins; //lista degli oggetti
     this.weaponskill = "Scherma";
     //Contenitore degli errori
     this.validator = [];
@@ -116,10 +115,12 @@ class CharacterGenerator  {
     
     this.setDifficulty(); // Setta la difficoltà
     this.setKaiDisciplines();
-    this.setAttributes();
+    // this.setAttributes();
+    this.setAttributes(3, "combatSkill");
+    this.setAttributes(3, "endurancePoints");
     this.findObj();
     this.goldCoin();
-    let x = Tools.convertStringInClassName('combatSkill');
+    
   }
   
   /*
@@ -127,34 +128,34 @@ class CharacterGenerator  {
     Cattura e gestisce gli input di tipo "radio" 
     La difficoltà di default è tarata sul "facile" (true)
   */
-  setDifficulty(){ 
+  setDifficulty(){
     let easy = document.querySelector('#easy');
     let hard = document.querySelector('#hard');
     
     easy.addEventListener('click', () => {
       if(easy.checked){
-        this.playerRes.difficulty = true;
+        this.playerValues.difficulty = true;
       }
     });
     
     hard.addEventListener('click', () => {
       if(hard.checked){
-        this.playerRes.difficulty = false;
+        this.playerValues.difficulty = false;
       }
     });
   }
-
+  
   /*
       setKaiDisciplines:
       Crea la lista delle arti ramas 
   */
   setKaiDisciplines(){
-    let weaponskillSpan; // 
+    let weaponskillSpan; //
     let weaponskillInput;
     // capture the element container #kai-disciplines
     let list = document.querySelector('#kai-disciplines');
-    let checkboxes = []; 
-    if(this.kaiDisciplines.length){ 
+    let checkboxes = [];
+    if(this.kaiDisciplines.length){
       //crea la lista delle arti ramas da selezionare
       this.kaiDisciplines.forEach( (discipline) => {
         let checkboxDiv = this.createElem('div',['checkbox']);
@@ -185,7 +186,7 @@ class CharacterGenerator  {
         checkboxDiv.appendChild(labelBox);
         list.appendChild(checkboxDiv);
         
-        //gestisce i check della lista 
+        //gestisce i check della lista
         input.addEventListener('change', () => {
           this.reset(this.validator, "kai-disciplines");
           if(input.checked) {
@@ -197,7 +198,7 @@ class CharacterGenerator  {
       });
     }
     
-    //gestisce il check del input 
+    //gestisce il check del input
     weaponskillInput.addEventListener('change', () => {
       
       if(weaponskillInput.checked) {
@@ -217,61 +218,28 @@ class CharacterGenerator  {
     this.checkBoxLimit(checkboxes, 5);
   }
   
-  setAttribute( max, elem ){
-     let counter = max;
-     let btn = document.querySelector(`label.${elem} button`);
-     let span = document.querySelector('label.${elem} .result');
-     btn.addEventListener('click', () => {
-       this.reset(this.validator, elem);
-       
-       if(this.playerValues.difficulty && counter){
-         this.playerValues.combattivita = this.innerHtml(combSpan);
-         counterComb--;
-       } else {
-         this.splice(this.validator, elem);
-         this.playerValues.combattivita = this.innerHtml(combSpan);
-         combBtn.disabled = true;
-         combBtn.classList.add('hidden');
-       }
-     });
+  setAttributes( max, elem ){
+    let counter = max;
+    let className = Tools.convertStringInClassName(elem);
+    let btn = document.querySelector(`label.${className} button`);
+    let span = document.querySelector(`label.${className} .result`);
+    if(btn){
+      btn.addEventListener('click', () => {
+        this.reset(this.validator, className);
+        
+        if(this.playerValues.difficulty && counter){
+          this.playerValues[elem] = this.innerHtml(span);
+          counter--;
+        } else {
+          this.splice(this.validator, elem);
+          this.playerValues[elem] = this.innerHtml(span);
+          btn.disabled = true;
+          btn.classList.add('hidden');
+        }
+      });
+    }
   }
-  
-  setAttributes(){
-    
-    let counterComb = 3;
-    let counterRes = 3;
-    
-    let combBtn = document.querySelector(`label.combattivita button`);
-    let combSpan = document.querySelector('label.combattivita .result');
-    let resBtn = document.querySelector('label.resistenza button');
-    let resSpan = document.querySelector('label.resistenza .result');
-    
-    combBtn.addEventListener('click', () => {
-      this.reset(this.validator, "combattivita");
-      
-      if(this.playerRes.difficulty && counterComb){
-        this.playerRes.combattivita = this.innerHtml(combSpan);
-        counterComb--;
-      } else {
-        this.splice(this.validator, "combattivita");
-        this.playerRes.combattivita = this.innerHtml(combSpan);
-        combBtn.disabled = true;
-        combBtn.classList.add('hidden');
-      }
-    });
-    
-    resBtn.addEventListener('click', () => {
-      this.reset(this.validator, "resistenza");
-      if(this.playerRes.difficulty && counterRes){
-        this.playerRes.resistenza = this.innerHtml(resSpan);
-        counterRes--;
-      } else {
-        this.playerRes.resistenza = this.innerHtml(resSpan);
-        resBtn.disabled = true;
-        resBtn.classList.add('hidden');
-      }
-    });
-  }
+   
   submitPlay(){
     if( (this.playerValues.combattivita === '') ||
       (this.playerValues.resistenza === '') ||
@@ -282,27 +250,27 @@ class CharacterGenerator  {
         this.resetAll(this.validator);
       }
       
-      if(this.playerRes.combattivita === '') {
+      if(this.playerValues.combattivita === '') {
         this.validation("combattivita", "Il bottone, pirla!");
         this.validator.push('combattivita');
       }
       
-      if(this.playerRes.resistenza === '') {
+      if(this.playerValues.resistenza === '') {
         this.validation("resistenza", "Lancia il dado");
         this.validator.push('resistenza');
       }
       
-      if(this.playerRes.artiRamas.length < 5) {
+      if(this.playerValues.artiRamas.length < 5) {
         this.validation("arti-ramas", "Devi scegliene 5");
         this.validator.push('arti-ramas');
       }
       
-      if(this.playerRes.oggettoTrovato === '') {
+      if(this.playerValues.oggettoTrovato === '') {
         this.validation("oggettoTrovato", "Cerca tra le macerie");
         this.validator.push('oggettoTrovato');
       }
       
-      if(this.playerRes.goldCoin === '') {
+      if(this.playerValues.goldCoin === '') {
         this.validation("goldCoin", "Non voui le corone d'oro?");
         this.validator.push('goldCoin');
       }
@@ -315,7 +283,7 @@ class CharacterGenerator  {
       // creazioneDiv.classList.add('slide-out-right');
       // setTimeout(() => {creazioneDiv.classList.add('hidden')}, 2000);
       // document.querySelector(`#game`).classList.add('slide-in-left');
-      return this.playerRes;
+      return this.playerValues;
     }
   }
   
@@ -327,13 +295,13 @@ class CharacterGenerator  {
     // let index = tag.search(regexp);
     // tag.toLowerCase();
     // tag = tag.slice(0, index) + "-" + tag.slice(index, tag.length);
-
+    
     // console.log('tag', tag);
     // tag.forEach( letter => {
     //   if (regexp.test(letter)) {
     //     console.log('letter', letter);
     //   }
-
+    
     // });
     document.querySelector(`.${tag}`).classList.remove('error');
     let el = document.querySelector(`.${tag} p.error-text`);
@@ -383,16 +351,16 @@ class CharacterGenerator  {
     findBtn.addEventListener('click', () => {
       this.reset(this.validator, "oggettoTrovato");
       
-      if(this.playerRes.difficulty && counter){
-        this.playerRes.oggettoTrovato = this.oggettiTrovati[this.dice()];
+      if(this.playerValues.difficulty && counter){
+        this.playerValues.oggettoTrovato = this.oggettiTrovati[this.dice()];
         
         this.nonUguali();
         
-        findIt.innerHTML = "Hai trovato [ " + this.playerRes.oggettoTrovato + " ]";
+        findIt.innerHTML = "Hai trovato [ " + this.playerValues.oggettoTrovato + " ]";
         counter--;
       } else {
-        this.playerRes.oggettoTrovato = this.oggettiTrovati[this.dice()];
-        findIt.innerHTML = "Hai trovato [ " + this.playerRes.oggettoTrovato + " ]";
+        this.playerValues.oggettoTrovato = this.oggettiTrovati[this.dice()];
+        findIt.innerHTML = "Hai trovato [ " + this.playerValues.oggettoTrovato + " ]";
         find.disabled = true;
         find.classList.add('hidden');
       }
@@ -409,14 +377,14 @@ class CharacterGenerator  {
     btn.addEventListener('click', () => {
       this.reset(this.validator, "goldCoin");
       
-      if(this.playerRes.difficulty && counter){
-        this.playerRes.goldCoin = this.dice();
+      if(this.playerValues.difficulty && counter){
+        this.playerValues.goldCoin = this.dice();
         
-        h3.innerHTML = "Hai trovato " + this.playerRes.goldCoin + " Corone d'oro";
+        h3.innerHTML = "Hai trovato " + this.playerValues.goldCoin + " Corone d'oro";
         counter--;
       } else {
-        this.playerRes.goldCoin = this.dice();
-        h3.innerHTML = "Hai trovato " + this.playerRes.goldCoin + " Corone d'oro";
+        this.playerValues.goldCoin = this.dice();
+        h3.innerHTML = "Hai trovato " + this.playerValues.goldCoin + " Corone d'oro";
         label.disabled = true;
         label.classList.add('hidden');
       }
@@ -425,9 +393,9 @@ class CharacterGenerator  {
   
   nonUguali(){
     let oggettoTemp = this.oggettiTrovati[this.dice()];
-    if(this.playerRes.oggettoTrovato === this.playerRes.arma){
-      console.log(`${this.playerRes.oggettoTrovato} === ${this.playerRes.arma}`);
-      this.playerRes.oggettoTrovato = this.oggettiTrovati[this.dice()];
+    if(this.playerValues.oggettoTrovato === this.playerValues.arma){
+      console.log(`${this.playerValues.oggettoTrovato} === ${this.playerValues.arma}`);
+      this.playerValues.oggettoTrovato = this.oggettiTrovati[this.dice()];
       this.nonUguali();
     }
   }
@@ -475,7 +443,7 @@ class CharacterGenerator  {
   
   innerHtml(tag){
     let res =  Tools.getDiceResult;
-    if(this.playerRes.difficulty){
+    if(this.playerValues.difficulty){
       if( (res + this.easyDifficulty) > 10){
         res = 10;
       }else {
