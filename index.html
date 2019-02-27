@@ -11,74 +11,85 @@
   <div id="main" class="wrapper-slide">
     
     <!-- Form che genera il personaggio -->
-    <ul id="character-generator" class="slide slide1">
-      
-      <li class="difficulty form-block">
+    <div id="character-generator" class="slide slide1">
+      <ul>
+        <li class="difficulty form-block">
+          
+          <h2>Livello di difficoltà</h2>
+          <div class="radio">
+            
+            <label class="container">Facile
+              <input id="easy" type="radio" checked="checked" name="radio">
+              <span class="checkmark"></span>
+            </label>
+            
+            <label class="container">Difficile
+              <input id="hard" type="radio" name="radio">
+              <span class="checkmark"></span>
+            </label>
+            
+          </div> <!-- radio -->
+          
+        </li> <!--.difficulty-->
         
-        <h2>Livello di difficoltà</h2>
-        <div class="radio">
-          
-          <label class="container">Facile
-            <input id="easy" type="radio" checked="checked" name="radio">
-            <span class="checkmark"></span>
+        <li class="characteristics form-block block">
+          <h2>Caratteristiche</h2>
+          <label class="combattivita"> Combattività
+            <span class="result"></span>
+            <button>🎲</button>
           </label>
-          
-          <label class="container">Difficile
-            <input id="hard" type="radio" name="radio">
-            <span class="checkmark"></span>
+          <label class="resistenza"> Resistenza
+            <span class="result"></span>
+            <button>🎲</button>
           </label>
-          
-        </div> <!-- radio -->
+        </li> <!--. characteristics -->
         
-      </li> <!--.difficulty-->
+        <li id="kai-disciplines" class="kai-disciplines form-block">
+          <h2>Arti Ramas</h2>
+          <p id="kai-disciplines"></p>
+        </li> <!--. arti-ramas -->
+        
+        <li class="form-block block goldCoin">
+          <label>
+            Lancia per le Corone d'oro
+            <button>🎲</button>
+          </label>
+          <h3></h3>
+        </li> <!--. goldCoin -->
+        
+        <li class=" form-block block">
+          <h2></h2>
+          <label id="find" class="oggettoTrovato">
+            Cerca tra le macerie
+            <button id="find-btn">🎲</button>
+          </label>
+          <h3 id="find-it"></h3>
+        </li> <!--. oggettoTrovato -->
+        
+        <li>
+        <button id="submit"> Gioca </button>
+        </li>
+      </ul> 
       
-    </ul> <!--character-generator-->
+      
+      
+    </div> <!--character-generator-->
     
     <div class="slide slide2"></div>
-    
+    <h1> Second Slider </h1>
   </div> <!--#main-->
   
   <div id="" name="creazione">
     
-    <div class="livello form-block">
-      
-    </div>  <!-- livello -->
     
-    <div class="caratteristiche form-block block">
-      <h2>Caratteristiche</h2>
-      <label class="combattivita"> Combattività
-        <span class="result"></span>
-        <button>🎲</button>
-      </label>
-      <label class="resistenza"> Resistenza
-        <span class="result"></span>
-        <button>🎲</button>
-      </label>
-    </div>
     
-    <div id="arti-ramas" class="arti-ramas form-block">
-      <h2>Arti Ramas</h2>
-      <p id="scherma-res"></p>
-    </div>
     
-    <div class="caratteristiche form-block block goldCoin">
-      <label>
-        Lancia per le Corone d'oro
-        <button>🎲</button>
-      </label>
-      <h3></h3>
-    </div>
     
-    <div class="caratteristiche form-block block">
-      <h2></h2>
-      <label id="find" class="oggettoTrovato">
-        Cerca tra le macerie
-        <button id="find-btn">🎲</button>
-      </label>
-      <h3 id="find-it"></h3>
-    </div>
     
-    <button id="submit"> Gioca </button>
+    
+    
+    
+    
   </div>
   
   <div id="game">

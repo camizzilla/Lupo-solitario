@@ -1,5 +1,5 @@
 //Lista delle arti ramas
-const artiRamas = [
+const kaiDisciplinesList = [
   "Mimetismo",
   "Caccia",
   "Sesto senso",
@@ -13,7 +13,7 @@ const artiRamas = [
 ];
 
 //Lista delle armi
-const armiList = [
+const weaponsList = [
   "Pugnale",
   "Lancia",
   "Mazza",
@@ -54,46 +54,229 @@ const risultatiCombattimento = [
   [{n: 6, ls: 0},{n: 7, ls: 0},{n: 8, ls: 0},{n: 9, ls: 0},{n: 10, ls: 0},{n: 12, ls: 0},{n: 14, ls: 0},{n: 16, ls: 0},{n: 18, ls: 0},{n: "M", ls: 0},{n: "M", ls: 0},{n: "M", ls: 0}]
 ];
 
+class Tools {
+  constructor(){}
+  
+  //ritorna un numero a caso da 0 a 9
+  static get getDiceResult(){
+    return Math.floor(Math.random() * 10) ;
+  }
+  
+  //Converte il nome di una variabile in un nome di una classe
+  //Esempio nomeStringa => nome-stringa
+  static convertStringInClassName( string ){
+    let regex = /[A-Z]/;
+    for ( let key in string){
+      let uppercase = regex.test(string[key]);
+      if(uppercase){
+      string =  string.slice(0, key -1) + "-" + string.slice(key , string.lengt);
+      string[key].toLowerCase();
+      
+      }
+    }
+    return string.toLowerCase();
+  }
+  
+}
+
 //Classe che gestisce il form per la creazione del personaggio
 class CharacterGenerator  {
-  constructor(artiRamas, armiList, itemsUnderRuins){
+  constructor(kaiDisciplinesList, weaponsList, itemsUnderRuins){
     
-    this.difficulty = true;
-    this.livelloFacile = 3;
-    this.validator = [];
+    this.difficulty = true; //livello difficoltà
+    this.easyDifficulty = 3; // aggiunge +3 al risultato del dado nel livello "easy"
     
-    this.playerRes = {
+    //Valori resettati del giocatore
+    this.playerValues = {
       difficulty: this.difficulty,
-      combattivita: '',
-      resistenza: '',
-      artiRamas: [],
-      oggettoTrovato: '',
-      arma: '',
+      combatSkill: '',
+      endurancePoints: '',
+      kaiDisciplines: [],
+      itemsUnderRuins: '',
+      weapons: '',
       goldCoin: ''
     };
     
-    this.artiRamas = artiRamas;
-    this.armi = armiList;
-    this.oggettiTrovati = itemsUnderRuins;
+    this.kaiDisciplines = kaiDisciplinesList; //lista delle arti-ramas
+    this.weapons = weaponsList; //lista delle armi
+    this.itemsUnderRuins = itemsUnderRuins; //lista degli oggetti 
+    this.weaponskill = "Scherma";
+    //Contenitore degli errori
+    this.validator = [];
+    
+    //Funzione di inizializzazione della classe
+    this.initCharacterGenerator();
   }
-  
-  formComponent(){
-    let facile = document.getElementById('easy');
-    let difficile = document.getElementById('hard');
+  /*
+  initCharacterGenerator:
+  Resetta e chiama le funzioni iniziali del generatore
+  */
+  initCharacterGenerator(){
     let reset = true;
-    this.level(facile, difficile);
-    this.addArtiRamas();
-    this.caratteristiche();
+    
+    this.setDifficulty(); // Setta la difficoltà
+    this.setKaiDisciplines();
+    this.setAttributes();
     this.findObj();
     this.goldCoin();
+    let x = Tools.convertStringInClassName('combatSkill');
   }
   
-  // console.log('this.playerRes::: ',this.playerRes);
+  /*
+    setDifficulty:
+    Cattura e gestisce gli input di tipo "radio" 
+    La difficoltà di default è tarata sul "facile" (true)
+  */
+  setDifficulty(){ 
+    let easy = document.querySelector('#easy');
+    let hard = document.querySelector('#hard');
+    
+    easy.addEventListener('click', () => {
+      if(easy.checked){
+        this.playerRes.difficulty = true;
+      }
+    });
+    
+    hard.addEventListener('click', () => {
+      if(hard.checked){
+        this.playerRes.difficulty = false;
+      }
+    });
+  }
+
+  /*
+      setKaiDisciplines:
+      Crea la lista delle arti ramas 
+  */
+  setKaiDisciplines(){
+    let weaponskillSpan; // 
+    let weaponskillInput;
+    // capture the element container #kai-disciplines
+    let list = document.querySelector('#kai-disciplines');
+    let checkboxes = []; 
+    if(this.kaiDisciplines.length){ 
+      //crea la lista delle arti ramas da selezionare
+      this.kaiDisciplines.forEach( (discipline) => {
+        let checkboxDiv = this.createElem('div',['checkbox']);
+        let labelBox = this.createElem('label',['container']);
+        
+        labelBox.innerHTML = discipline;
+        let input = document.createElement('input');
+        input.setAttribute("type", "checkbox");
+        input.setAttribute("name", "checkbox");
+        input.id = discipline;
+        
+        // Se l'arte ramas è lo "scherma"
+        // salva l'input in weaponskillInput
+        // crea uno span per visualizzare l'arma che è stata scelta
+        if(discipline === this.weaponskill) {
+          weaponskillInput = input;
+          weaponskillSpan = document.createElement('span');
+          weaponskillSpan.classList.add(this.weaponskill, "hidden");
+          labelBox.appendChild(weaponskillSpan);
+        }
+        
+        checkboxes.push(input);
+        
+        let span = this.createElem('span', ['checkmark']);
+        
+        labelBox.appendChild(input);
+        labelBox.appendChild(span);
+        checkboxDiv.appendChild(labelBox);
+        list.appendChild(checkboxDiv);
+        
+        //gestisce i check della lista 
+        input.addEventListener('change', () => {
+          this.reset(this.validator, "kai-disciplines");
+          if(input.checked) {
+            this.playerValues.kaiDisciplines.push(discipline);
+          }else {
+            this.splice(this.playerValues.kaiDisciplines, discipline);
+          }
+        });
+      });
+    }
+    
+    //gestisce il check del input 
+    weaponskillInput.addEventListener('change', () => {
+      
+      if(weaponskillInput.checked) {
+        
+        if(!this.playerValues.weapons){
+          this.playerValues.weapons = this.weapons[Tools.getDiceResult];
+          weaponskillSpan.innerHTML = this.playerValues.weapons;
+        }
+        if(weaponskillSpan.classList.contains("hidden")){
+          weaponskillSpan.classList.remove("hidden");
+        }
+      } else {
+        weaponskillSpan.classList.add("hidden");
+      }
+    });
+    
+    this.checkBoxLimit(checkboxes, 5);
+  }
+  
+  setAttribute( max, elem ){
+     let counter = max;
+     let btn = document.querySelector(`label.${elem} button`);
+     let span = document.querySelector('label.${elem} .result');
+     btn.addEventListener('click', () => {
+       this.reset(this.validator, elem);
+       
+       if(this.playerValues.difficulty && counter){
+         this.playerValues.combattivita = this.innerHtml(combSpan);
+         counterComb--;
+       } else {
+         this.splice(this.validator, elem);
+         this.playerValues.combattivita = this.innerHtml(combSpan);
+         combBtn.disabled = true;
+         combBtn.classList.add('hidden');
+       }
+     });
+  }
+  
+  setAttributes(){
+    
+    let counterComb = 3;
+    let counterRes = 3;
+    
+    let combBtn = document.querySelector(`label.combattivita button`);
+    let combSpan = document.querySelector('label.combattivita .result');
+    let resBtn = document.querySelector('label.resistenza button');
+    let resSpan = document.querySelector('label.resistenza .result');
+    
+    combBtn.addEventListener('click', () => {
+      this.reset(this.validator, "combattivita");
+      
+      if(this.playerRes.difficulty && counterComb){
+        this.playerRes.combattivita = this.innerHtml(combSpan);
+        counterComb--;
+      } else {
+        this.splice(this.validator, "combattivita");
+        this.playerRes.combattivita = this.innerHtml(combSpan);
+        combBtn.disabled = true;
+        combBtn.classList.add('hidden');
+      }
+    });
+    
+    resBtn.addEventListener('click', () => {
+      this.reset(this.validator, "resistenza");
+      if(this.playerRes.difficulty && counterRes){
+        this.playerRes.resistenza = this.innerHtml(resSpan);
+        counterRes--;
+      } else {
+        this.playerRes.resistenza = this.innerHtml(resSpan);
+        resBtn.disabled = true;
+        resBtn.classList.add('hidden');
+      }
+    });
+  }
   submitPlay(){
-    if( (this.playerRes.combattivita === '') ||
-      (this.playerRes.resistenza === '') ||
-      (this.playerRes.artiRamas.length < 5) ||
-      (this.playerRes.oggettoTrovato === '')
+    if( (this.playerValues.combattivita === '') ||
+      (this.playerValues.resistenza === '') ||
+      (this.playerValues.artiRamas.length < 5) ||
+      (this.playerValues.oggettoTrovato === '')
     ){
       if(this.validator){
         this.resetAll(this.validator);
@@ -136,21 +319,22 @@ class CharacterGenerator  {
     }
   }
   
-  level(facile, difficile){
-    facile.addEventListener('click', () => {
-      if(facile.checked){
-        this.playerRes.difficulty = true;
-      }
-    });
-    
-    difficile.addEventListener('click', () => {
-      if(difficile.checked){
-        this.playerRes.difficulty = false;
-      }
-    });
-  }
+  
   
   reset(array, tag){
+    
+    // let regexp = /[A-Z]/;
+    // let index = tag.search(regexp);
+    // tag.toLowerCase();
+    // tag = tag.slice(0, index) + "-" + tag.slice(index, tag.length);
+
+    // console.log('tag', tag);
+    // tag.forEach( letter => {
+    //   if (regexp.test(letter)) {
+    //     console.log('letter', letter);
+    //   }
+
+    // });
     document.querySelector(`.${tag}`).classList.remove('error');
     let el = document.querySelector(`.${tag} p.error-text`);
     if(el){
@@ -187,106 +371,9 @@ class CharacterGenerator  {
     }
   }
   
-  caratteristiche(){
-    let counterComb = 3;
-    let counterRes = 3;
-    let varAble = "combattivita";
-    let combBtn = document.querySelector(`label.${varAble} button`);
-    let combSpan = document.querySelector('label.combattivita .result');
-    let resBtn = document.querySelector('label.resistenza button');
-    let resSpan = document.querySelector('label.resistenza .result');
-    
-    combBtn.addEventListener('click', () => {
-      this.reset(this.validator, "combattivita");
-      
-      if(this.playerRes.livello && counterComb){
-        this.playerRes.combattivita = this.innerHtml(combSpan);
-        counterComb--;
-      } else {
-        this.splice(this.validator, "combattivita");
-        this.playerRes.combattivita = this.innerHtml(combSpan);
-        combBtn.disabled = true;
-        combBtn.classList.add('hidden');
-      }
-    });
-    
-    resBtn.addEventListener('click', () => {
-      this.reset(this.validator, "resistenza");
-      if(this.playerRes.livello && counterRes){
-        this.playerRes.resistenza = this.innerHtml(resSpan);
-        counterRes--;
-      } else {
-        this.playerRes.resistenza = this.innerHtml(resSpan);
-        resBtn.disabled = true;
-        resBtn.classList.add('hidden');
-      }
-    });
-  }
   
-  addArtiRamas(){
-    let schemaHtml;
-    // Make the list
-    let listElement = document.getElementById('arti-ramas');
-    let checkboxes = [];
-    let scherma;
-    if(this.artiRamas.length){
-      this.artiRamas.forEach( (arte) => {
-        let checkboxDiv = this.createElem('div',['checkbox']);
-        let labelBox = this.createElem('label',['container']);
-        
-        labelBox.innerHTML = arte;
-        let input = document.createElement('input');
-        input.setAttribute("type", "checkbox");
-        input.setAttribute("name", "checkbox");
-        input.id = arte;
-        
-        if(arte === "Scherma") {
-          scherma = input;
-          schemaHtml = document.createElement('span');
-          schemaHtml.classList.add("arma", "hidden");
-          labelBox.appendChild(schemaHtml);
-        }
-        checkboxes.push(input);
-        
-        let span = this.createElem('span', ['checkmark']);
-        
-        labelBox.appendChild(input);
-        labelBox.appendChild(span);
-        checkboxDiv.appendChild(labelBox);
-        listElement.appendChild(checkboxDiv);
-        
-        input.addEventListener('change', () => {
-          if(input.checked) {
-            this.playerRes.artiRamas.push(arte);
-          }else {
-            this.splice(this.playerRes.artiRamas, arte);
-            
-            // if(arte === "Scherma") {
-            //   this.playerRes.arma = "";
-            // }
-          }
-        });
-      });
-    }
-    this.checkBoxLimit(checkboxes, 5);
-    
-    let schermaRes = document.getElementById('scherma-res');
-    scherma.addEventListener('change', () => {
-      
-      if(scherma.checked) {
-        this.reset(this.validator, "arti-ramas");
-        if(!this.playerRes.arma){
-          this.playerRes.arma = this.armi[this.dice()];
-          schemaHtml.innerHTML = this.playerRes.arma;
-        }
-        if(schemaHtml.classList.contains("hidden")){
-          schemaHtml.classList.remove("hidden");
-        }
-      } else {
-        schemaHtml.classList.add("hidden");
-      }
-    });
-  }
+  
+  
   
   findObj(){
     let counter = 3;
@@ -296,7 +383,7 @@ class CharacterGenerator  {
     findBtn.addEventListener('click', () => {
       this.reset(this.validator, "oggettoTrovato");
       
-      if(this.playerRes.livello && counter){
+      if(this.playerRes.difficulty && counter){
         this.playerRes.oggettoTrovato = this.oggettiTrovati[this.dice()];
         
         this.nonUguali();
@@ -322,7 +409,7 @@ class CharacterGenerator  {
     btn.addEventListener('click', () => {
       this.reset(this.validator, "goldCoin");
       
-      if(this.playerRes.livello && counter){
+      if(this.playerRes.difficulty && counter){
         this.playerRes.goldCoin = this.dice();
         
         h3.innerHTML = "Hai trovato " + this.playerRes.goldCoin + " Corone d'oro";
@@ -387,21 +474,21 @@ class CharacterGenerator  {
   }
   
   innerHtml(tag){
-    let res =  this.dice();
-    if(this.playerRes.livello){
-      if( (res + this.livelloFacile) > 10){
+    let res =  Tools.getDiceResult;
+    if(this.playerRes.difficulty){
+      if( (res + this.easyDifficulty) > 10){
         res = 10;
       }else {
-        res += this.livelloFacile;
+        res += this.easyDifficulty;
       }
     }
     tag.innerHTML = res;
     return res;
   }
   
-  dice(){
-    return Math.floor(Math.random() * 10) ;
-  }
+  // dice(){
+  //   return Math.floor(Math.random() * 10) ;
+  // }
 }
 /************************************************/
 /************************************************/
@@ -413,7 +500,7 @@ class CharacterGenerator  {
 class Player {
   constructor(
     {
-      livello,
+      difficulty,
       combattivita,
       resistenza,
       artiRamas,
@@ -424,7 +511,7 @@ class Player {
     armiList,
     risultatiCombattimento
   ) {
-    this.livello = livello ? 3 : 0;
+    this.difficulty = difficulty ? 3 : 0;
     this.combattivita = 10 + combattivita;
     this.resistenza = 20 + resistenza;
     
@@ -1018,14 +1105,13 @@ class Enemy {
 }
 
 
-let characterGenerator = new CharacterGenerator(artiRamas, armiList, itemsUnderRuins);
-characterGenerator.formComponent();
+let characterGenerator = new CharacterGenerator(kaiDisciplinesList, weaponsList, itemsUnderRuins);
 
 let submit = document.getElementById("submit");
 submit.addEventListener('click', () => {
   let play = characterGenerator.submitPlay();
   if(play){
-    let player = new Player( play, armiList, risultatiCombattimento );
+    let player = new Player( play, weaponsList, risultatiCombattimento );
     player.init();
   }
 });

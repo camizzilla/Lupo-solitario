@@ -6,6 +6,60 @@ body {
   padding: var(--px-base-unit);
 }
 
+* {
+  box-sizing: border-box;
+}
+
+ul {
+  list-style: none;
+  margin:0;
+  padding: 0;
+}
+
+.wrapper-slide {
+  width: 100%;
+  height: 100vh;
+  overflow: scroll;
+  position: relative;
+}
+
+.slide {
+  width: 100%;
+  height: 100%;
+  background: red;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 1;
+  z-index: 0;
+  
+  display: flex;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  flex-direction: row;
+  flex-wrap: wrap;
+  
+  -webkit-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  
+  -webkit-transition: -webkit-transform 1600ms;
+  transition: -webkit-transform 1600ms, transform 1600ms;
+  -webkit-transform: scale(1);
+  transform: scale(1);
+}
+/* each slide background color */
+.slide1 {
+  background: #00bcd7;
+  left: 0;
+}
+.slide2 {
+  background: #009788;
+  left: 100%
+}
+
 label {
   display: block;
   position: relative;
