@@ -34,11 +34,12 @@
         
         <li class="characteristics form-block block">
           <h2>Caratteristiche</h2>
-          <label class="combattivita"> Combattività
+          <label class="combat-skill">
+            <span>Combattività</span>
             <span class="result"></span>
             <button>🎲</button>
           </label>
-          <label class="resistenza"> Resistenza
+          <label class="endurance-points"> Resistenza
             <span class="result"></span>
             <button>🎲</button>
           </label>
@@ -49,7 +50,7 @@
           <p id="kai-disciplines"></p>
         </li> <!--. arti-ramas -->
         
-        <li class="form-block block goldCoin">
+        <li class="form-block block gold-coin">
           <label>
             Lancia per le Corone d'oro
             <button>🎲</button>
@@ -57,94 +58,88 @@
           <h3></h3>
         </li> <!--. goldCoin -->
         
-        <li class=" form-block block">
-          <h2></h2>
-          <label id="find" class="oggettoTrovato">
+        <li class=" form-block block items-under-ruins">
+          <label>
             Cerca tra le macerie
-            <button id="find-btn">🎲</button>
+            <button>🎲</button>
           </label>
-          <h3 id="find-it"></h3>
+          <h3></h3>
         </li> <!--. oggettoTrovato -->
         
         <li>
-        <button id="submit"> Gioca </button>
+          <button id="submit"> Gioca </button>
         </li>
-      </ul> 
+      </ul>
       
       
       
     </div> <!--character-generator-->
     
-    <div class="slide slide2"></div>
-    <h1> Second Slider </h1>
+    <div  class="slide slide2">
+      
+      <div id="action-chart">
+        <ul>
+          <li class="combat-skill">
+            
+            <label>Combattività</label>
+            <div>
+              <button class="combat-skill-plus math"> + </button>
+              <h4></h4>
+              <button class="combat-skill-minus math"> - </button>
+            </div>
+            
+          </li> <!-- combat-skill -->
+          <li class="endurance-points">
+            <label>Resistenza</label>
+            <div>
+              <button class="endurance-points-plus math"> + </button>
+              <h4></h4>
+              <button class="endurance-points-minus math"> - </button>
+            </div>
+          </li><!-- endurance-points -->
+        </ul>
+        
+          <div class="kai-disciplines">
+            <h4>Arti ramas</h4>
+            <ol class="kai-disciplines_list"></ol>
+          </div>
+          <div class="weapon">
+            <h4>Armi</h4>
+            <ol class="armamento"></ol>
+          </div>
+          
+          <div>
+            <h4>Zaino</h4>
+            <ul class="zaino">
+              <h5>Oggetti</h5>
+              <li>
+                <ol class="items"></ol>
+              </li>
+              <li>
+                <h3 class="potions">Pozioni:</h3>
+              </li>
+              <li>
+                <h3 class="foods">Pasti:</h3>
+              </li>
+            </ul>
+          </div>
+          <li id="note">
+            <h3>Note</h3>
+            <ul></ul>
+          </li>
+       
+      </div><!-- #action-chart -->
+      
+      <div >
+        
+      </div>
+      <!-- #Game -->
+    </div>
   </div> <!--#main-->
   
-  <div id="" name="creazione">
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-  </div>
   
-  <div id="game">
-    <h1>Lupo Solitario</h1>
-    <div id="diario-combattimento">
-      <ul>
-        <li class="comb">
-          <label>Combattività</label>
-          <div>
-            <button class="comb-plus"> + </button>
-            <h4></h4>
-            <button class="comb-minus"> - </button>
-          </div>
-        </li>
-        <li class="res">
-          <label>Resistenza</label>
-          <div>
-            <button class="res-plus"> + </button>
-            <h4></h4>
-            <button class="res-minus"> - </button>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div id="registro-guerra">
-      <h3>Registro di guerra</h3>
-      <h4>Arti ramas</h4>
-      <ol class="arti">
-      </ol>
-      <h4>Armi</h4>
-      <ol class="armamento"></ol>
-      <h4>Zaino</h4>
-      <div class="zaino">
-        <h5>Oggetti</h5>
-        <ol class="items"></ol>
-        <h3 class="potions">Pozioni:</h3>
-        <h3 class="foods">Pasti:</h3>
-      </div>
-      <div class="borsa">
-        <h3>Corone d'oro:</h3>
-      </div>
-      <h4>Oggetti Speciali</h4>
-      <ul class="oggettiSpeciali"></ul>
-      
-      
-    </div>
-    <div id="note">
-      <h3>Note</h3>
-      <ul>
-        
-      </ul>
-    </div>
-  </div> <!-- #Game -->
   
-  <div id="combattimento">
+  <!-- <div id="combattimento">
     <h2>Nemico</h2>
     <div class="EnemyComb">
       <label>Combattività</label>
@@ -171,19 +166,19 @@
     <button id="addEnemy"> add Enemy </button>
     <p class="error hidden"></p>
     <ul class="enemy-list"></ul>
-  </div><!--#combattimento-->
+  </div> --> <!--#combattimento-->
   
-  <div id="throw-dice">
+  <!--<div id="throw-dice">
     <label> Lancia il dado
       <span class="result"></span>
       <button class="dice">🎲</button>
       <button class="reset">Reset</button>
     </label>
-  </div><!--#throwDice-->
+  </div> --><!--#throwDice-->
   
-  <div id="game-over" class="hidden">
+  <!-- <div id="game-over" class="hidden">
     <h1>Sei morto!!!</h1>
-  </div>
+  </div> -->
   
   <script src="js/main.js"></script>
   

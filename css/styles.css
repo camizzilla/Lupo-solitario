@@ -2,12 +2,13 @@
   --px-base-unit : 15px;
 }
 
-body {
-  padding: var(--px-base-unit);
+html,body {
+  height: 100%;
+  box-sizing: border-box;
 }
 
-* {
-  box-sizing: border-box;
+body {
+  padding: var(--px-base-unit);
 }
 
 ul {
@@ -18,46 +19,77 @@ ul {
 
 .wrapper-slide {
   width: 100%;
-  height: 100vh;
-  overflow: scroll;
-  position: relative;
+  height: auto;
+  /*overflow: hidden;*/
+  position: static;
+  
 }
 
 .slide {
   width: 100%;
   height: 100%;
-  background: red;
+  background: #fff;
   position: absolute;
   left: 0;
   top: 0;
   opacity: 1;
   z-index: 0;
-  
   display: flex;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  flex-direction: row;
-  flex-wrap: wrap;
+  /*flex-direction: column;*/
+  justify-content: space-around;
+  /*align-items: stretch;*/
   
-  -webkit-flex-align: center;
-  -webkit-align-items: center;
-  align-items: center;
-  justify-content: center;
-  align-content: center;
-  
-  -webkit-transition: -webkit-transform 1600ms;
-  transition: -webkit-transform 1600ms, transform 1600ms;
-  -webkit-transform: scale(1);
-  transform: scale(1);
+  -webkit-transition: left 1s ease-in-out;
+  transition: left 1s ease-in-out;
 }
-/* each slide background color */
+
+
 .slide1 {
-  background: #00bcd7;
+  /*background: #fff;*/
   left: 0;
 }
 .slide2 {
-  background: #009788;
+  /*background: #fff;*/
   left: 100%
+}
+
+.slide1.active {
+  left: -100%;
+}
+
+.slide2.active {
+  left: 0;
+}
+
+/*BUTTON*/
+button {
+  background-color: #fff; 
+  border: none;
+  color: #2196F3;
+  padding: 5px 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+  border: 2px solid;
+}
+
+button:hover {
+  color: #fff;
+  background-color: #2196F3;
+  border: 2px solid;
+}
+
+button#submit {
+  width: 100%;  
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+button.math {
+  width: 30px;
+  height: 30px;
+  vertical-align: middle
 }
 
 label {
@@ -182,3 +214,36 @@ label {
   font-size: 26px;
   color: red;
 }
+
+
+#action-chart {
+  font-size: 22px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: space-between;
+}
+
+#action-chart ul{
+  display: flex;
+  justify-content: space-around;
+}
+
+#action-chart ul li label{
+  width:100%;
+  text-align: center;
+}
+
+#action-chart ul li div{
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+/*var(--cyan)*/
+/*var(--dark)*/
+/*var(--borderW)*/
+
+
+
+

@@ -54,6 +54,15 @@ const risultatiCombattimento = [
   [{n: 6, ls: 0},{n: 7, ls: 0},{n: 8, ls: 0},{n: 9, ls: 0},{n: 10, ls: 0},{n: 12, ls: 0},{n: 14, ls: 0},{n: 16, ls: 0},{n: 18, ls: 0},{n: "M", ls: 0},{n: "M", ls: 0},{n: "M", ls: 0}]
 ];
 
+const text = {
+  error: {
+    
+  },
+  note: {
+    
+  }
+  };
+
 class Tools {
   constructor(){}
   
@@ -64,15 +73,23 @@ class Tools {
   
   //Converte il nome di una variabile in un nome di una classe
   //Esempio nomeStringa => nome-stringa
+  
   static convertStringInClassName( string ){
-    let stringElab = "";
     let regex = /[A-Z]/;
+    let stringStore = [];
+    let indexStart = 0;
+    
     for ( let key in string){
       let uppercase = regex.test(string[key]);
       if(uppercase){
-        stringElab =  string.slice(0, key) + "-" + string.slice(key, string.lengt);
+        stringStore.push(string.slice(indexStart, key));
+        indexStart = key;
+        // stringElab =  string.slice(0, key) + "-" + string.slice(key, string.lengt);
       }
     }
+    stringStore.push(string.slice(indexStart, string.lengt));
+    
+    let stringElab = stringStore.join('-');
     return stringElab.toLowerCase();
   }
   
@@ -104,13 +121,13 @@ class CharacterGenerator  {
     this.validator = [];
     
     //Funzione di inizializzazione della classe
-    this.initCharacterGenerator();
+    this.init();
   }
   /*
   initCharacterGenerator:
   Resetta e chiama le funzioni iniziali del generatore
   */
-  initCharacterGenerator(){
+  init(){
     let reset = true;
     
     this.setDifficulty(); // Setta la difficoltà
@@ -118,9 +135,10 @@ class CharacterGenerator  {
     // this.setAttributes();
     this.setAttributes(3, "combatSkill");
     this.setAttributes(3, "endurancePoints");
-    this.findObj();
-    this.goldCoin();
+    this.setGoldCoin();
+    this.setItemsUnderRuins();
     
+    this.setSubmit();
   }
   
   /*
@@ -154,7 +172,9 @@ class CharacterGenerator  {
     let weaponskillInput;
     // capture the element container #kai-disciplines
     let list = document.querySelector('#kai-disciplines');
-    let checkboxes = [];
+    // let checkboxes = [];
+    let limit = 5;
+    let checkboxCounter = 0;
     if(this.kaiDisciplines.length){
       //crea la lista delle arti ramas da selezionare
       this.kaiDisciplines.forEach( (discipline) => {
@@ -177,7 +197,7 @@ class CharacterGenerator  {
           labelBox.appendChild(weaponskillSpan);
         }
         
-        checkboxes.push(input);
+        // checkboxes.push(input);
         
         let span = this.createElem('span', ['checkmark']);
         
@@ -188,34 +208,38 @@ class CharacterGenerator  {
         
         //gestisce i check della lista
         input.addEventListener('change', () => {
-          this.reset(this.validator, "kai-disciplines");
+          this.reset(this.validator, "kaiDisciplines");
           if(input.checked) {
-            this.playerValues.kaiDisciplines.push(discipline);
+            if(checkboxCounter < limit){
+              checkboxCounter++;
+              if(input == weaponskillInput){
+                if(!this.playerValues.weapons){
+                  this.playerValues.weapons = this.weapons[Tools.getDiceResult];
+                  weaponskillSpan.innerHTML = this.playerValues.weapons;
+                }
+                if(weaponskillSpan.classList.contains("hidden")){
+                  weaponskillSpan.classList.remove("hidden");
+                }
+              }
+              this.playerValues.kaiDisciplines.push(discipline);
+            }else {
+              input.checked = false;
+            }
+            
           }else {
+            if(checkboxCounter > 0){
+              checkboxCounter--;
+            }
+            if(input == weaponskillInput) {
+              weaponskillSpan.classList.add("hidden");
+            }
             this.splice(this.playerValues.kaiDisciplines, discipline);
           }
         });
       });
     }
     
-    //gestisce il check del input
-    weaponskillInput.addEventListener('change', () => {
-      
-      if(weaponskillInput.checked) {
-        
-        if(!this.playerValues.weapons){
-          this.playerValues.weapons = this.weapons[Tools.getDiceResult];
-          weaponskillSpan.innerHTML = this.playerValues.weapons;
-        }
-        if(weaponskillSpan.classList.contains("hidden")){
-          weaponskillSpan.classList.remove("hidden");
-        }
-      } else {
-        weaponskillSpan.classList.add("hidden");
-      }
-    });
-    
-    this.checkBoxLimit(checkboxes, 5);
+    // this.checkBoxLimit(checkboxes, 5);
   }
   
   setAttributes( max, elem ){
@@ -225,7 +249,7 @@ class CharacterGenerator  {
     let span = document.querySelector(`label.${className} .result`);
     if(btn){
       btn.addEventListener('click', () => {
-        this.reset(this.validator, className);
+        this.reset(this.validator, elem);
         
         if(this.playerValues.difficulty && counter){
           this.playerValues[elem] = this.innerHtml(span);
@@ -239,35 +263,97 @@ class CharacterGenerator  {
       });
     }
   }
-   
+  
+  setGoldCoin(){
+    let counter = 3;
+    let name = "goldCoin";
+    let className = Tools.convertStringInClassName(name);
+    let btn = document.querySelector(`.${className} button`);
+    let label = document.querySelector(`.${className} label`);
+    let h3 = document.querySelector(`.${className} h3`);
+    
+    btn.addEventListener('click', () => {
+      this.reset(this.validator, name);
+      
+      if(this.playerValues.difficulty && counter){
+        this.playerValues.goldCoin = Tools.getDiceResult;
+        
+        h3.innerHTML = "Hai trovato " + this.playerValues.goldCoin + " Corone d'oro";
+        counter--;
+      } else {
+        this.playerValues.goldCoin = Tools.getDiceResult;
+        h3.innerHTML = "Hai trovato " + this.playerValues.goldCoin + " Corone d'oro";
+        label.disabled = true;
+        label.classList.add('hidden');
+      }
+    });
+  }
+  
+  setItemsUnderRuins(){
+    let counter = 3;
+    let name = "itemsUnderRuins";
+    let className = Tools.convertStringInClassName(name);
+    let btn = document.querySelector(`.${className} button`);
+    let label = document.querySelector(`.${className} label`);
+    let h3 = document.querySelector(`.${className} h3`);
+    
+    btn.addEventListener('click', () => {
+      this.reset(this.validator, name);
+      if(this.playerValues.difficulty && counter){
+        this.playerValues.itemsUnderRuins = this.itemsUnderRuins[Tools.getDiceResult];
+        
+        // this.notSame();
+        
+        h3.innerHTML = `Hai trovato [ ${this.playerValues.itemsUnderRuins} ]`;
+        counter--;
+      } else {
+        this.playerValues.itemsUnderRuins = this.itemsUnderRuins[Tools.getDiceResult];
+        h3.innerHTML = `Hai trovato [ ${this.playerValues.itemsUnderRuins} ]`;
+        label.disabled = true;
+        label.classList.add('hidden');
+      }
+    });
+  }
+  
+  
+  // notSame(){
+  //   // let Tmp = this.itemsUnderRuins[Tools.getDiceResult];
+  //   if(this.playerValues.itemsUnderRuins === this.playerValues.weapons){
+  
+  //     this.playerValues.itemsUnderRuins = this.itemsUnderRuins[Tools.getDiceResult];
+  //     this.notSame();
+  //   }
+  // }
+  
   submitPlay(){
-    if( (this.playerValues.combattivita === '') ||
-      (this.playerValues.resistenza === '') ||
-      (this.playerValues.artiRamas.length < 5) ||
-      (this.playerValues.oggettoTrovato === '')
+    if(
+      (this.playerValues.combatSkill === '') ||
+      (this.playerValues.endurancePoints === '') ||
+      (this.playerValues.kaiDisciplines.length < 5) ||
+      (this.playerValues.itemsUnderRuins === '')
     ){
       if(this.validator){
         this.resetAll(this.validator);
       }
       
-      if(this.playerValues.combattivita === '') {
-        this.validation("combattivita", "Il bottone, pirla!");
-        this.validator.push('combattivita');
+      if(this.playerValues.combatSkill === '') {
+        this.validation("combatSkill", "Il bottone, pirla!");
+        this.validator.push('combatSkill');
       }
       
-      if(this.playerValues.resistenza === '') {
-        this.validation("resistenza", "Lancia il dado");
-        this.validator.push('resistenza');
+      if(this.playerValues.endurancePoints === '') {
+        this.validation("endurancePoints", "Lancia il dado");
+        this.validator.push('endurancePoints');
       }
       
-      if(this.playerValues.artiRamas.length < 5) {
-        this.validation("arti-ramas", "Devi scegliene 5");
-        this.validator.push('arti-ramas');
+      if(this.playerValues.kaiDisciplines.length < 5) {
+        this.validation("kaiDisciplines", "Devi scegliene 5");
+        this.validator.push('kaiDisciplines');
       }
       
-      if(this.playerValues.oggettoTrovato === '') {
-        this.validation("oggettoTrovato", "Cerca tra le macerie");
-        this.validator.push('oggettoTrovato');
+      if(this.playerValues.itemsUnderRuins === '') {
+        this.validation("itemsUnderRuins", "Cerca tra le macerie");
+        this.validator.push('itemsUnderRuins');
       }
       
       if(this.playerValues.goldCoin === '') {
@@ -276,45 +362,33 @@ class CharacterGenerator  {
       }
       return false;
     } else {
-      if(this.validator.length){
-        this.reset(this.validator);
-      }
-      let creazioneDiv = document.querySelector(`#creazione`);
-      // creazioneDiv.classList.add('slide-out-right');
-      // setTimeout(() => {creazioneDiv.classList.add('hidden')}, 2000);
-      // document.querySelector(`#game`).classList.add('slide-in-left');
+      // if(this.validator.length){
+      //   this.reset(this.validator);
+      // }
+      
+      let sliders = document.querySelectorAll('.slide');
+      sliders.forEach(slide => slide.classList.add("active"));
       return this.playerValues;
     }
   }
   
   
   
-  reset(array, tag){
-    
-    // let regexp = /[A-Z]/;
-    // let index = tag.search(regexp);
-    // tag.toLowerCase();
-    // tag = tag.slice(0, index) + "-" + tag.slice(index, tag.length);
-    
-    // console.log('tag', tag);
-    // tag.forEach( letter => {
-    //   if (regexp.test(letter)) {
-    //     console.log('letter', letter);
-    //   }
-    
-    // });
-    document.querySelector(`.${tag}`).classList.remove('error');
-    let el = document.querySelector(`.${tag} p.error-text`);
+  reset(array, elem){
+    let classElem = Tools.convertStringInClassName(elem);
+    document.querySelector(`.${classElem}`).classList.remove('error');
+    let el = document.querySelector(`.${classElem} p.error-text`);
     if(el){
       el.parentNode.removeChild(el);
     }
-    this.splice(array, tag);
+    this.splice(array, classElem);
   }
   
   resetAll(tagArr){
     tagArr.forEach(element => {
-      document.querySelector(`.${element}`).classList.remove('error');
-      let el = document.querySelector(`.${element} p.error-text`);
+      let classElem = Tools.convertStringInClassName(element);
+      document.querySelector(`.${classElem}`).classList.remove('error');
+      let el = document.querySelector(`.${classElem} p.error-text`);
       if(el){
         el.parentNode.removeChild(el);
       }
@@ -323,8 +397,8 @@ class CharacterGenerator  {
   
   validation(element, message){
     let msg = message ? message : "errore generico";
-    
-    let el = document.querySelector(`.${element}`);
+    let classElem = Tools.convertStringInClassName(element);
+    let el = document.querySelector(`.${classElem}`);
     el.classList.add('error');
     let error = document.createElement('p');
     error.classList.add('error-text');
@@ -339,70 +413,6 @@ class CharacterGenerator  {
     }
   }
   
-  
-  
-  
-  
-  findObj(){
-    let counter = 3;
-    let findBtn = document.getElementById('find-btn');
-    let find = document.getElementById('find');
-    let findIt = document.getElementById('find-it');
-    findBtn.addEventListener('click', () => {
-      this.reset(this.validator, "oggettoTrovato");
-      
-      if(this.playerValues.difficulty && counter){
-        this.playerValues.oggettoTrovato = this.oggettiTrovati[this.dice()];
-        
-        this.nonUguali();
-        
-        findIt.innerHTML = "Hai trovato [ " + this.playerValues.oggettoTrovato + " ]";
-        counter--;
-      } else {
-        this.playerValues.oggettoTrovato = this.oggettiTrovati[this.dice()];
-        findIt.innerHTML = "Hai trovato [ " + this.playerValues.oggettoTrovato + " ]";
-        find.disabled = true;
-        find.classList.add('hidden');
-      }
-    });
-    
-  }
-  
-  goldCoin(){
-    let counter = 3;
-    let btn = document.querySelector('.goldCoin button');
-    let label = document.querySelector('.goldCoin label');
-    let h3 = document.querySelector('.goldCoin h3');
-    
-    btn.addEventListener('click', () => {
-      this.reset(this.validator, "goldCoin");
-      
-      if(this.playerValues.difficulty && counter){
-        this.playerValues.goldCoin = this.dice();
-        
-        h3.innerHTML = "Hai trovato " + this.playerValues.goldCoin + " Corone d'oro";
-        counter--;
-      } else {
-        this.playerValues.goldCoin = this.dice();
-        h3.innerHTML = "Hai trovato " + this.playerValues.goldCoin + " Corone d'oro";
-        label.disabled = true;
-        label.classList.add('hidden');
-      }
-    });
-  }
-  
-  nonUguali(){
-    let oggettoTemp = this.oggettiTrovati[this.dice()];
-    if(this.playerValues.oggettoTrovato === this.playerValues.arma){
-      console.log(`${this.playerValues.oggettoTrovato} === ${this.playerValues.arma}`);
-      this.playerValues.oggettoTrovato = this.oggettiTrovati[this.dice()];
-      this.nonUguali();
-    }
-  }
-  
-  getElem(tag, classes){
-    return document.getElementsByClassName(classes);
-  }
   
   createElem(tag, classes){
     let el = document.createElement(tag);
@@ -433,14 +443,6 @@ class CharacterGenerator  {
     });
   }
   
-  maxNumber(counter,max){
-    if(counter <= max) return true;
-  }
-  
-  error(msg, tag){
-    document.getElementById(tag).innerHTML = msg;
-  }
-  
   innerHtml(tag){
     let res =  Tools.getDiceResult;
     if(this.playerValues.difficulty){
@@ -454,9 +456,16 @@ class CharacterGenerator  {
     return res;
   }
   
-  // dice(){
-  //   return Math.floor(Math.random() * 10) ;
-  // }
+  setSubmit(){
+    let submit = document.querySelector("#submit");
+    submit.addEventListener('click', () => {
+      if(this.submitPlay()){
+        
+        let player = new Player( this.playerValues, weaponsList, risultatiCombattimento );
+      }
+    });
+  }
+  
 }
 /************************************************/
 /************************************************/
@@ -464,14 +473,13 @@ class CharacterGenerator  {
 /************************************************/
 /************************************************/
 
-
 class Player {
   constructor(
     {
       difficulty,
-      combattivita,
-      resistenza,
-      artiRamas,
+      combatSkill,
+      endurancePoints,
+      kaiDisciplines,
       oggettoTrovato,
       arma,
       goldCoin
@@ -480,10 +488,10 @@ class Player {
     risultatiCombattimento
   ) {
     this.difficulty = difficulty ? 3 : 0;
-    this.combattivita = 10 + combattivita;
-    this.resistenza = 20 + resistenza;
+    this.combatSkill = 10 + combatSkill;
+    this.endurancePoints = 20 + endurancePoints;
     
-    this.artiRamas = artiRamas;
+    this.kaiDisciplines = kaiDisciplines;
     this.abilitaScherma = arma || null;
     
     this.risultatiCombattimento = risultatiCombattimento;
@@ -509,27 +517,71 @@ class Player {
     this.oggettiSpeciali = [
       "Mappa di Summerlund"
     ];
-    this.combElem = document.querySelector(".comb h4");
-    this.resElem = document.querySelector(".res h4");
-    
+
     this.enemyId = 0;
+    this.init();
   }
   
   init(){
-    this.controlObj();
-    this.addArmi();
-    this.aggiungiArtiRamas();
-    this.aggiornaCaratteristiche();
-    this.printPotions();
-    this.printFood();
-    this.printItems();
-    this.borsello();
-    this.aggiungiOggettiSpeciali();
-    this.ctrlResComb();
+    // this.controlObj();
+    // this.addArmi();
+    // this.aggiungiArtiRamas();
+    this.setPhysicalCharacteristics("combatSkill");
+    this.setPhysicalCharacteristics("endurancePoints");
+    this.setkaiDisciplines();
+    // this.printPotions();
+    // this.printFood();
+    // this.printItems();
+    // this.borsello();
+    // this.aggiungiOggettiSpeciali();
+    // this.ctrlResComb();
     
-    this.addEnemy();
-    this.throwDice();
+    // this.addEnemy();
+    // this.throwDice();
   }
+  
+  
+  setPhysicalCharacteristics(characteristic){
+    let nameClass = Tools.convertStringInClassName(characteristic);
+    this[`${characteristic}Element`] = document.querySelector(`#action-chart .${nameClass} h4`);
+    this.updateCharacteristics(characteristic);
+    
+    this.ctrlCharacteristics(nameClass, characteristic);
+  }
+  
+  ctrlCharacteristics(className, characteristic){
+    let btnPlus = document.querySelector(`.${className}-plus`);
+    let btnMinus = document.querySelector(`.${className}-minus`);
+    
+    btnPlus.addEventListener('click', () => {
+      this[characteristic]++;
+      this.updateCharacteristics(characteristic);
+    });
+    btnMinus.addEventListener('click', () => {
+      this[characteristic]--;
+      this.updateCharacteristics(characteristic);
+    });
+  }
+  
+  updateCharacteristics(characteristic){
+    this[`${characteristic}Element`].innerHTML = this[characteristic];
+  }
+  
+  //Setta le arti ramas scelte
+  setkaiDisciplines(){
+    let listElement = document.querySelector('#action-chart .kai-disciplines ol');
+    
+    if(this.kaiDisciplines.length){
+      this.kaiDisciplines.forEach( discipline => {
+        let list = document.createElement('li',['discipline']);
+        list.innerHTML = discipline;
+        listElement.appendChild(list);
+        
+        this.addNote(discipline);
+      });
+    }
+  }
+  
   
   controlObj(){
     let arma = this.controlInArray(this.armiList, this.oggettoTrovato);
@@ -551,38 +603,31 @@ class Player {
     }
   }
   
-  aggiornaCaratteristiche(){
-    this.print(this.combElem, this.combattivita);
-    this.print(this.resElem, this.resistenza);
-    if(this.resistenza <= 0){
-      this.resistenza = 0;
-      this.gameOver();
-    }
-  }
   
-  ctrlResComb(){
-    let btnPlusRes = document.querySelector(".res-plus");
-    let btnMinusRes = document.querySelector(".res-minus");
-    let btnPlusComb = document.querySelector(".comb-plus");
-    let btnMinusComb = document.querySelector(".comb-minus");
+  
+  // ctrlResComb(){
+  //   let btnPlusRes = document.querySelector(".res-plus");
+  //   let btnMinusRes = document.querySelector(".res-minus");
+  //   let btnPlusComb = document.querySelector(".comb-plus");
+  //   let btnMinusComb = document.querySelector(".comb-minus");
     
-    btnPlusRes.addEventListener('click', () => {
-      this.resistenza++;
-      this.aggiornaCaratteristiche();
-    });
-    btnMinusRes.addEventListener('click', () => {
-      this.resistenza--;
-      this.aggiornaCaratteristiche();
-    });
-    btnPlusComb.addEventListener('click', () => {
-      this.combattivita++;
-      this.aggiornaCaratteristiche();
-    });
-    btnMinusComb.addEventListener('click', () => {
-      this.combattivita--;
-      this.aggiornaCaratteristiche();
-    });
-  }
+  //   btnPlusRes.addEventListener('click', () => {
+  //     this.resistenza++;
+  //     this.aggiornaCaratteristiche();
+  //   });
+  //   btnMinusRes.addEventListener('click', () => {
+  //     this.resistenza--;
+  //     this.aggiornaCaratteristiche();
+  //   });
+  //   btnPlusComb.addEventListener('click', () => {
+  //     this.combattivita++;
+  //     this.aggiornaCaratteristiche();
+  //   });
+  //   btnMinusComb.addEventListener('click', () => {
+  //     this.combattivita--;
+  //     this.aggiornaCaratteristiche();
+  //   });
+  // }
   
   addArmi(){
     let maxItems = 2;
@@ -719,19 +764,7 @@ class Player {
       this[objName] = 0;
     }
   }
-  aggiungiArtiRamas(){
-    let listElement = document.querySelector('#registro-guerra .arti');
-    
-    if(this.artiRamas.length){
-      this.artiRamas.forEach( arte => {
-        let list = document.createElement('li',['arte']);
-        list.innerHTML = arte;
-        listElement.appendChild(list);
-        
-        this.filtroArtiRamas(arte);
-      });
-    }
-  }
+  
   printPotions(){
     let maxItems = this.maxItems;
     let potions = this.printQuery(".zaino .potions", this.pozione);
@@ -799,18 +832,18 @@ class Player {
     }
   }
   
-  filtroArtiRamas(arte){
-    if(arte === "Guarigione") {
-      this.AddNota(`${arte}: Guarisci un punto di resistenza per ogni tappa senza combattimento`);
-    }else if(arte === "Caccia"){
-      this.AddNota(`${arte}: Non sei obbligato a fare un Pasto quando ti viene ordinato`);
-    }else if(arte === "Scherma"){
+  addNote(discipline){
+    if(discipline === "Guarigione") {
+      this.AddNota(`${discipline}: Guarisci un punto di resistenza per ogni tappa senza combattimento`);
+    }else if(discipline === "Caccia"){
+      this.AddNota(`${discipline}: Non sei obbligato a fare un Pasto quando ti viene ordinato`);
+    }else if(discipline === "Scherma"){
       if(this.abilitaScherma){
         this.armi.forEach(arma => {
           if(arma === this.abilitaScherma) this.combattivita += 2;
         });
       }
-    }else if (arte === "Psicolaser"){
+    }else if (discipline === "Psicolaser"){
       this.combattivita += 2;
     }
   }
@@ -1075,14 +1108,14 @@ class Enemy {
 
 let characterGenerator = new CharacterGenerator(kaiDisciplinesList, weaponsList, itemsUnderRuins);
 
-let submit = document.getElementById("submit");
-submit.addEventListener('click', () => {
-  let play = characterGenerator.submitPlay();
-  if(play){
-    let player = new Player( play, weaponsList, risultatiCombattimento );
-    player.init();
-  }
-});
+// let submit = document.getElementById("submit");
+// submit.addEventListener('click', () => {
+//   let play = characterGenerator.submitPlay();
+//   if(play){
+//     let player = new Player( play, weaponsList, risultatiCombattimento );
+//     player.init();
+//   }
+// });
 
 
 // resSpan.innerHTML = res;
