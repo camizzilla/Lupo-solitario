@@ -59,9 +59,10 @@ const text = {
     
   },
   note: {
-    
+    name: "Guarigione",
+    text : "Guarisci un punto di resistenza per ogni tappa senza combattimento"
   }
-  };
+};
 
 class Tools {
   constructor(){}
@@ -109,7 +110,7 @@ class CharacterGenerator  {
       endurancePoints: '',
       kaiDisciplines: [],
       itemsUnderRuins: '',
-      weapons: '',
+      weaponskill: '',
       goldCoin: ''
     };
     
@@ -480,11 +481,11 @@ class Player {
       combatSkill,
       endurancePoints,
       kaiDisciplines,
-      oggettoTrovato,
-      arma,
+      itemsUnderRuins,
+      weaponskill,
       goldCoin
     },
-    armiList,
+    weaponsList,
     risultatiCombattimento
   ) {
     this.difficulty = difficulty ? 3 : 0;
@@ -492,21 +493,20 @@ class Player {
     this.endurancePoints = 20 + endurancePoints;
     
     this.kaiDisciplines = kaiDisciplines;
-    this.abilitaScherma = arma || null;
+    this.abilitaScherma = weaponskill || null;
     
     this.risultatiCombattimento = risultatiCombattimento;
     
-    this.oggettoTrovato = oggettoTrovato;
+    this.itemsUnderRuins = itemsUnderRuins;
     
-    this.itemInBag = 0;
-    this.pasti = 1;
-    this.pozione = 0;
-    this.oggetti = [];
+    this.food = 1;
+    this.potions = 0;
+    this.items = [];
     
-    this.maxItems = 9;
+    this.maxItemsInBackpack = 9;
     
-    this.armiList = armiList;
-    this.armi = ["Ascia"];
+    this.armiList = weaponsList;
+    this.weapons = ["Ascia"];
     
     this.borsa = {
       coroneOro : goldCoin
@@ -517,18 +517,18 @@ class Player {
     this.oggettiSpeciali = [
       "Mappa di Summerlund"
     ];
-
+    
     this.enemyId = 0;
     this.init();
   }
   
   init(){
-    // this.controlObj();
-    // this.addArmi();
-    // this.aggiungiArtiRamas();
+    this.setItemsUnderRuins();
+    
     this.setPhysicalCharacteristics("combatSkill");
     this.setPhysicalCharacteristics("endurancePoints");
     this.setkaiDisciplines();
+    this.setWeapons();
     // this.printPotions();
     // this.printFood();
     // this.printItems();
@@ -577,99 +577,74 @@ class Player {
         list.innerHTML = discipline;
         listElement.appendChild(list);
         
-        this.addNote(discipline);
+        this.addNotes(discipline);
       });
     }
   }
   
-  
-  controlObj(){
-    let arma = this.controlInArray(this.armiList, this.oggettoTrovato);
-    if(arma) {
-      this.armi.push(arma);
-      
-    }else if( "elmo" === this.oggettoTrovato){
-      this.oggettiSpeciali.push(this.oggettoTrovato);
-      this.resistenza += 2;
-    }else if( "Cotta di maglia" === this.oggettoTrovato){
-      this.oggettiSpeciali.push(this.oggettoTrovato);
-      this.resistenza += 4;
-    }else if( "Pasti" === this.oggettoTrovato){
-      this.pasti += 2;
-    }else if( "Corone d'oro" === this.oggettoTrovato){
-      this.goldCoins += 12;
-    }else if( "Pozione" === this.oggettoTrovato){
-      this.pozione += 1;
-    }
-  }
-  
-  
-  
-  // ctrlResComb(){
-  //   let btnPlusRes = document.querySelector(".res-plus");
-  //   let btnMinusRes = document.querySelector(".res-minus");
-  //   let btnPlusComb = document.querySelector(".comb-plus");
-  //   let btnMinusComb = document.querySelector(".comb-minus");
+  setWeapons(){
+    let maxWeapons = 2;
+    let listElement = document.querySelector('#action-chart .weapons ol');
     
-  //   btnPlusRes.addEventListener('click', () => {
-  //     this.resistenza++;
-  //     this.aggiornaCaratteristiche();
-  //   });
-  //   btnMinusRes.addEventListener('click', () => {
-  //     this.resistenza--;
-  //     this.aggiornaCaratteristiche();
-  //   });
-  //   btnPlusComb.addEventListener('click', () => {
-  //     this.combattivita++;
-  //     this.aggiornaCaratteristiche();
-  //   });
-  //   btnMinusComb.addEventListener('click', () => {
-  //     this.combattivita--;
-  //     this.aggiornaCaratteristiche();
-  //   });
-  // }
-  
-  addArmi(){
-    let maxItems = 2;
-    let list = document.querySelector('#registro-guerra .armamento');
+    let btnPLus = this.btnAdd(listElement, maxWeapons, "weapons");
     
-    let btnPLus = this.btnAddItem(list, maxItems, "armi");
-    
-    if(this.armi.length){
-      this.armi.forEach( (arma) => {
-        this.addItemList(arma, "armi", list, btnPLus, maxItems);
+    if(this.weapons.length){
+      this.weapons.forEach( (weapon) => {
+        this.addItemList(weapon, "weapons", listElement, btnPLus, maxWeapons);
       });
     }
   }
   
   addItemList(className, arrayName, list, btnPLus, maxItems){
-    let item = document.createElement('li');
-    item.innerHTML = className;
-    this.addBtnCanc(item, arrayName, className, list, btnPLus, maxItems);
-    list.appendChild(item);
+    let li = document.createElement('li');
+    li.classList.add(className);
+    li.innerHTML = className;
+    list.appendChild(li);
+    this.addBtnCanc(li, arrayName, className, list, btnPLus, maxItems);
   }
   
-  //
+  setItemsUnderRuins(){
+    let weapon = this.controlInArray(this.armiList, this.itemsUnderRuins);
+    if(weapon) {
+      this.weapons.push(weapon);
+      
+    }else if( "elmo" === this.itemsUnderRuins){
+      this.oggettiSpeciali.push(this.itemsUnderRuins);
+      this.resistenza += 2;
+    }else if( "Cotta di maglia" === this.itemsUnderRuins){
+      this.oggettiSpeciali.push(this.itemsUnderRuins);
+      this.resistenza += 4;
+    }else if( "Pasti" === this.itemsUnderRuins){
+      this.pasti += 2;
+    }else if( "Corone d'oro" === this.itemsUnderRuins){
+      this.goldCoins += 12;
+    }else if( "Pozione" === this.itemsUnderRuins){
+      this.pozione += 1;
+    }
+  }
+
   addBtnCanc(item, arrayName, element, list, btnPLus, maxItems){
     let btn = document.createElement('button');
     btn.innerHTML = "remove";
+    btn.classList.add('btn-remove');
     item.appendChild(btn);
     
     btn.addEventListener('click', () => {
       const index = this[arrayName].indexOf(element);
       this[arrayName].splice(index, 1);
       list.removeChild(item);
-      if(this.maxItem(arrayName, maxItems)){
+      if(this.isMax(arrayName, maxItems)){
         btnPLus.classList.remove('hidden');
       }
     });
   }
   
-  btnAddItem(list, maxItems, arrayName){
+  btnAdd(list, maxItems, arrayName){
     let btn = document.createElement('button');
     btn.innerHTML = "+";
+    btn.classList.add('math');
     
-    if(!this.maxItem(arrayName, maxItems)){
+    if(!this.isMax(arrayName, maxItems)){
       btn.classList.add('hidden');
     }
     
@@ -703,7 +678,7 @@ class Player {
       this.addItemList(value, "armi", list, addItem, maxItems);
       div.classList.add('hidden');
       input.value = "";
-      if(this.maxItem(arrayName, maxItems)) addItem.classList.remove('hidden');
+      if(this.isMax(arrayName, maxItems)) addItem.classList.remove('hidden');
     });
     return div;
   }
@@ -712,9 +687,9 @@ class Player {
     this[array].push(value);
   }
   
-  btnPlusMinus(className, objName, elem, maxItems){
+  btnPlusMinus(elemName, elem, maxItems){
     let div = document.createElement('div');
-    div.classList.add(className);
+    div.classList.add(elemName);
     let btnPlus = document.createElement('button');
     btnPlus.innerHTML = "+";
     let btnMinus = document.createElement('button');
@@ -724,13 +699,13 @@ class Player {
     div.appendChild(btnMinus);
     
     btnPlus.addEventListener('click', () => {
-      if( !this.checkBag(objName)){
-        this.addOne(objName);
-        this.update(objName, elem);
+      if( !this.checkBag(elemName)){
+        this.addOne(elemName);
+        this.update(elemName, elem);
       } else {
-        if(this.maxItem(objName, maxItems)){
-          this.addOne(objName);
-          this.update(objName, elem);
+        if(this.isMax(elemName, maxItems)){
+          this.addOne(elemName);
+          this.update(elemName, elem);
         } else {
           this.btnAddItems.classList.add('hidden');
         }
@@ -738,10 +713,10 @@ class Player {
       
     });
     btnMinus.addEventListener('click', () => {
-      this.subtractOne(objName);
-      this.update(objName, elem);
+      this.subtractOne(elemName);
+      this.update(elemName, elem);
       
-      if( this.checkBag(objName) && this.maxItem(objName, maxItems)){
+      if( this.checkBag(elemName) && this.isMax(elemName, maxItems)){
         this.btnAddItems.classList.remove('hidden');
       }
     });
@@ -765,11 +740,14 @@ class Player {
     }
   }
   
-  printPotions(){
-    let maxItems = this.maxItems;
-    let potions = this.printQuery(".zaino .potions", this.pozione);
-    let btnPlusMinus = this.btnPlusMinus("potions", "pozione", potions.span, maxItems);
+  setItem(elemName){
+   let elem = this.printQuery(elemName);
+  let btnPlusMinus = this.btnPlusMinus(elemName, elem.span, this.maxItemsInBackpack);
     potions.elem.appendChild(btnPlusMinus);
+  }
+  
+  printPotions(elemName){
+    
   }
   
   printFood(){
@@ -822,7 +800,7 @@ class Player {
     }
   }
   
-  maxItem(arrayName, max){
+  isMax(arrayName, max){
     let length = this.lengthItems(arrayName);
     
     if(length < max){
@@ -832,11 +810,11 @@ class Player {
     }
   }
   
-  addNote(discipline){
-    if(discipline === "Guarigione") {
-      this.AddNota(`${discipline}: Guarisci un punto di resistenza per ogni tappa senza combattimento`);
+  addNotes(discipline){
+    if(discipline === "") {
+      this.AddNote(`${discipline}: `);
     }else if(discipline === "Caccia"){
-      this.AddNota(`${discipline}: Non sei obbligato a fare un Pasto quando ti viene ordinato`);
+      this.AddNote(`${discipline}: Non sei obbligato a fare un Pasto quando ti viene ordinato`);
     }else if(discipline === "Scherma"){
       if(this.abilitaScherma){
         this.armi.forEach(arma => {
@@ -848,7 +826,7 @@ class Player {
     }
   }
   
-  AddNota(nota){
+  AddNote(nota){
     let listElement = document.querySelector('#note ul');
     let list = document.createElement('li',['nota']);
     list.innerHTML = nota;
@@ -856,11 +834,11 @@ class Player {
   }
   
   //TOOL
-  printQuery(query, value){
-    let element = document.querySelector(query);
+  printQuery(elem){
+    let element = document.querySelector(`.${elem}`);
     let span = document.createElement('span');
     element.appendChild(span);
-    this.print(span, value);
+    this.print(span, elem);
     return {
       span:span,
       elem: element
@@ -868,7 +846,7 @@ class Player {
   }
   
   print(elem, value){
-    elem.innerHTML = value;
+    elem.innerHTML = this[value];
   }
   
   controlInArray(array, element){
