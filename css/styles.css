@@ -226,30 +226,30 @@ label {
 #action-chart {
   font-size: 22px;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: space-between;
+  /*display: flex;*/
+  /*flex-direction: column;*/
+  /*justify-content: flex-start;*/
+  /*align-items: space-between;*/
   margin-top:30px;
 }
 
 #action-chart > div {
   display:flex;
   justify-content: center;
-  margin-top:15px;
+  /*margin-top:15px;*/
 }
 
-#action-chart ul{
+#action-chart > ul{
   display: flex;
   justify-content: space-around;
 }
 
-#action-chart ul li label{
+#action-chart > ul li label{
   width:100%;
   text-align: center;
 }
 
-#action-chart ul li div{
+#action-chart > ul li div{
   display: flex;
   justify-content: space-between;
   align-items: baseline;

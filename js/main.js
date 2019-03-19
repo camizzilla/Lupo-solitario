@@ -499,11 +499,11 @@ class Player {
     
     this.itemsUnderRuins = itemsUnderRuins;
     
-    this.food = 1;
+    this.foods = 1;
     this.potions = 0;
     this.items = [];
     
-    this.maxItemsInBackpack = 9;
+    this.maxItemsInBackpack = 8;
     
     this.armiList = weaponsList;
     this.weapons = ["Ascia"];
@@ -527,10 +527,13 @@ class Player {
     
     this.setPhysicalCharacteristics("combatSkill");
     this.setPhysicalCharacteristics("endurancePoints");
-    this.setkaiDisciplines();
-    this.setWeapons();
-    // this.printPotions();
-    // this.printFood();
+    this.setListElement('kaiDisciplines');
+    // this.setkaiDisciplines();
+    
+    this.setWeapons('weapons', 2);
+    this.setWeapons('items', this.maxItemsInBackpack);
+    this.setItem("potions");
+    this.setItem("foods");
     // this.printItems();
     // this.borsello();
     // this.aggiungiOggettiSpeciali();
@@ -567,30 +570,20 @@ class Player {
     this[`${characteristic}Element`].innerHTML = this[characteristic];
   }
   
-  //Setta le arti ramas scelte
-  setkaiDisciplines(){
-    let listElement = document.querySelector('#action-chart .kai-disciplines ol');
+  setListElement(elemName, maxElem = null){
+    let className = Tools.convertStringInClassName(elemName);
+    let listElement = document.querySelector(`#action-chart .${className} ol`);
     
-    if(this.kaiDisciplines.length){
-      this.kaiDisciplines.forEach( discipline => {
-        let list = document.createElement('li',['discipline']);
-        list.innerHTML = discipline;
+    let btnPLus = this.btnAdd( listElement, maxElem, elemName) || null;
+    
+    if(this[elemName].length){
+      this[elemName].forEach( elem => {
+        
+        let list = document.createElement('li');
+        list.innerHTML = elem;
         listElement.appendChild(list);
         
-        this.addNotes(discipline);
-      });
-    }
-  }
-  
-  setWeapons(){
-    let maxWeapons = 2;
-    let listElement = document.querySelector('#action-chart .weapons ol');
-    
-    let btnPLus = this.btnAdd(listElement, maxWeapons, "weapons");
-    
-    if(this.weapons.length){
-      this.weapons.forEach( (weapon) => {
-        this.addItemList(weapon, "weapons", listElement, btnPLus, maxWeapons);
+        this.addNotes(elem);
       });
     }
   }
@@ -601,6 +594,44 @@ class Player {
     li.innerHTML = className;
     list.appendChild(li);
     this.addBtnCanc(li, arrayName, className, list, btnPLus, maxItems);
+  }
+  
+  addBtnCanc(item, arrayName, element, list, btnPLus, maxItems){
+    let btn = document.createElement('button');
+    btn.innerHTML = "remove";
+    btn.classList.add('btn-remove');
+    item.appendChild(btn);
+    
+    btn.addEventListener('click', () => {
+      const index = this[arrayName].indexOf(element);
+      this[arrayName].splice(index, 1);
+      list.removeChild(item);
+      if(this.isMax(arrayName, maxItems)){
+        btnPLus.classList.remove('hidden');
+      }
+    });
+  }
+  
+  setWeapons(elemName, maxItems){
+    let listElement = document.querySelector(`#action-chart .${elemName} ol`);
+    
+    let btnPLus = this.btnAdd(listElement, maxItems, elemName);
+    
+    if(this[elemName].length){
+      this[elemName].forEach( (elem) => {
+        this.addItemList(elem, elemName, listElement, btnPLus, maxItems);
+      });
+    }
+  }
+  
+  printItems(){
+    let list = document.querySelector('.zaino ol.items');
+    
+    if(this.oggetti.length){
+      this.oggetti.forEach( oggetto => {
+        this.addItemList(oggetto, "oggetti", list, this.btnAddItems, maxItem);
+      });
+    }
   }
   
   setItemsUnderRuins(){
@@ -622,22 +653,8 @@ class Player {
       this.pozione += 1;
     }
   }
-
-  addBtnCanc(item, arrayName, element, list, btnPLus, maxItems){
-    let btn = document.createElement('button');
-    btn.innerHTML = "remove";
-    btn.classList.add('btn-remove');
-    item.appendChild(btn);
-    
-    btn.addEventListener('click', () => {
-      const index = this[arrayName].indexOf(element);
-      this[arrayName].splice(index, 1);
-      list.removeChild(item);
-      if(this.isMax(arrayName, maxItems)){
-        btnPLus.classList.remove('hidden');
-      }
-    });
-  }
+  
+  
   
   btnAdd(list, maxItems, arrayName){
     let btn = document.createElement('button');
@@ -648,7 +665,7 @@ class Player {
       btn.classList.add('hidden');
     }
     
-    let form = this.inputForm(arrayName, arrayName, list, btn, maxItems);
+    let form = this.inputForm(arrayName, list, btn, maxItems);
     
     list.before(btn);
     list.before(form);
@@ -661,9 +678,9 @@ class Player {
     return btn;
   }
   
-  inputForm(className, arrayName, list, addItem, maxItems){
+  inputForm(arrayName, list, addItem, maxItems){
     let div = document.createElement('div');
-    div.classList.add('hidden', className);
+    div.classList.add('hidden');
     
     let input = document.createElement('input');
     let btn = document.createElement('button');
@@ -675,7 +692,7 @@ class Player {
     btn.addEventListener('click', () => {
       let value = input.value;
       if(value) this.addInputArray(arrayName, value);
-      this.addItemList(value, "armi", list, addItem, maxItems);
+      this.addItemList(value, arrayName, list, addItem, maxItems);
       div.classList.add('hidden');
       input.value = "";
       if(this.isMax(arrayName, maxItems)) addItem.classList.remove('hidden');
@@ -741,32 +758,24 @@ class Player {
   }
   
   setItem(elemName){
-   let elem = this.printQuery(elemName);
-  let btnPlusMinus = this.btnPlusMinus(elemName, elem.span, this.maxItemsInBackpack);
-    potions.elem.appendChild(btnPlusMinus);
-  }
-  
-  printPotions(elemName){
-    
-  }
-  
-  printFood(){
-    let maxItems = this.maxItems;
-    let food = this.printQuery(".zaino .foods", this.pasti);
-    let btnPlusMinus = this.btnPlusMinus("foods", "pasti", food.span, maxItems);
-    food.elem.appendChild( btnPlusMinus );
-  }
-  
-  printItems(){
-    let maxItem = this.maxItems;
-    let list = document.querySelector('.zaino ol.items');
-    this.btnAddItems = this.btnAddItem(list, maxItem, "oggetti");
-    if(this.oggetti.length){
-      this.oggetti.forEach( oggetto => {
-        this.addItemList(oggetto, "oggetti", list, this.btnAddItems, maxItem);
-      });
+    if(Array.isArray(this[elemName])){
+      let list = document.querySelector(`.back-pack ol.${elemName}`);
+      this.btnAddItems = this.btnAddItem(list, maxItem, elemName);
+      if(this[elemName].length){
+        this[elemName].forEach( item => {
+          this.addItemList(item, item, list, this.btnAddItems, maxItem);
+        });
+      }
+    } else {
+      let elem = this.printQuery(elemName);
+      let btnPlusMinus = this.btnPlusMinus(elemName, elem.span, this.maxItemsInBackpack);
+      elem.elem.appendChild(btnPlusMinus);
     }
   }
+  
+  
+  
+
   
   borsello(){
     let maxCoin = 50;
@@ -789,12 +798,12 @@ class Player {
   }
   
   checkBag(arrayName){
-    return arrayName == "pasti" || arrayName == "pozione" || arrayName == "oggetti";
+    return arrayName == "foods" || arrayName == "potions" || arrayName == "items";
   }
   
   lengthItems(arrayName){
     if(this.checkBag(arrayName)){
-      return this.oggetti.length + this.pasti + this.pozione;
+      return this.items.length + this.foods + this.potions;
     }else {
       return this[arrayName].length;
     }
